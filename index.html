@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>무한 파딱: ALLIANCE & CHIMERA</title>
+    <title>무한 파딱: EVOLUTION</title>
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&family=Jua&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,20 +11,20 @@
             --n: #95a5a6; --r: #3498db; --sr: #9b59b6; --ssr: #f1c40f; --ur: #00cec9; --f: #e74c3c; 
             --hidden: #444;
             --text: #f5f6fa; --border: #333;
-            --accent: #e67e22; --danger: #eb4d4b; --success: #6ab04c;
-            --coop-bad: #d63031; /* 좆목질 색상 */
-            --coop-good: #00cec9; /* 정의구현 색상 */
+            --accent: #e67e22; --danger: #eb4d4b; --success: #2ecc71;
+            --coop-bad: #d63031; 
+            --coop-good: #00cec9; 
         }
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
         
         body {
             margin: 0; padding: 0; background: var(--bg); color: var(--text);
             font-family: 'Noto Sans KR', sans-serif;
-            min-height: 100vh; overflow-y: auto; padding-bottom: 160px;
+            min-height: 100vh; overflow-y: auto; padding-bottom: 220px; /* 하단 공간 확장 */
         }
         
         h1, .pop-rank, .c-rank, .font-title, .res-group, .slot-header { font-family: 'Black Han Sans', sans-serif; }
-        .font-pixel, .btn-gacha-text { font-family: 'Jua', sans-serif; }
+        .font-pixel, .btn-gacha-text, .util-btn { font-family: 'Jua', sans-serif; }
 
         /* HEADER */
         header {
@@ -63,7 +63,7 @@
         }
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* FUSION ALTAR (기존 디자인에 자연스럽게 녹이기) */
+        /* FUSION ALTAR */
         .altar-area {
             margin: 15px 15px 0 15px; padding: 15px; background: linear-gradient(135deg, #181818, #0a0a0a);
             border: 1px solid var(--border); border-radius: 12px;
@@ -103,7 +103,7 @@
         /* CARD STYLE */
         .card {
             background: var(--panel); border: 1px solid #333; border-radius: 8px; padding: 10px;
-            position: relative; display: flex; flex-direction: column; gap: 4px; min-height: 110px;
+            position: relative; display: flex; flex-direction: column; gap: 4px; min-height: 120px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; cursor: pointer;
         }
         .card.selected { border: 2px solid var(--success) !important; background: #0f2215 !important; transform: scale(0.97); }
@@ -134,12 +134,16 @@
         
         .c-name { font-weight: 900; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color:#ddd;}
         .c-info { font-size: 0.75rem; color: #888; }
-        /* c-status를 원래 스타일대로 복구 */
         .c-status { 
             font-size: 0.75rem; color: #aaa; margin-top: auto; font-weight: bold; min-height: 1.2em;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         
+        .trait-badge {
+            font-size: 0.7rem; color: #fab1a0; background: rgba(255,255,255,0.1); 
+            padding: 1px 4px; border-radius: 3px; margin-right: 3px; display: inline-block;
+        }
+
         .btn-fire { 
             background: #222; color: #ccc; border: 1px solid #444; 
             border-radius: 4px; padding: 3px 8px; font-size: 0.7rem; cursor: pointer;
@@ -151,7 +155,7 @@
         #section-logs {
             background: #000; padding: 12px; border: 1px solid #333; border-radius: 8px;
             font-family: 'Noto Sans KR', sans-serif; font-size: 0.9rem; line-height: 1.6;
-            height: 200px; overflow-y: auto; box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+            height: 180px; overflow-y: auto; box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
         }
         .log { margin-bottom: 4px; border-bottom: 1px dashed #222; padding-bottom: 2px; text-shadow: 1px 1px 0 #000; }
         .l-sys { color: #555; font-size: 0.8rem; }
@@ -163,14 +167,30 @@
         .l-coop-bad { color: #d63031; font-weight: 900; border-left: 3px solid #d63031; padding-left: 5px; }
         .l-coop-good { color: #00cec9; font-weight: 900; border-left: 3px solid #00cec9; padding-left: 5px; }
 
-        /* FOOTER (2버튼으로 변경하되 디자인은 1번 코드 계승) */
+        /* FOOTER & UTILITY */
         footer {
             position: fixed; bottom: 0; left: 0; width: 100%;
-            display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;
-            padding: 15px; background: rgba(10,10,10,0.95); border-top: 1px solid #333; z-index: 90;
+            padding: 10px; background: rgba(10,10,10,0.98); border-top: 1px solid #333; z-index: 90;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        
+        .utility-bar {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+        }
+        .util-btn {
+            height: 40px; border: none; border-radius: 8px; color: #fff; cursor: pointer;
+            font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 5px;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.4); transition: 0.1s;
+        }
+        .util-btn:active { transform: translateY(3px); box-shadow: none; }
+        .btn-pizza { background: #e17055; }
+        .btn-fever { background: #d63031; animation: pulse 1s infinite; }
+        
+        .gacha-bar {
+            display: grid; grid-template-columns: 1fr 1.3fr; gap: 10px;
         }
         .btn-gacha {
-            height: 65px; border: none; border-radius: 12px; color: #fff; cursor: pointer;
+            height: 60px; border: none; border-radius: 12px; color: #fff; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             box-shadow: 0 6px 0 rgba(0,0,0,0.5); transition: 0.1s; text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.1);
@@ -179,7 +199,7 @@
         .btn-gacha:disabled { filter: grayscale(1); opacity: 0.5; transform: translateY(6px); box-shadow: none; }
         
         #btn-norm { background: linear-gradient(135deg, #34495e, #2c3e50); box-shadow: 0 6px 0 #1e272e; }
-        #btn-prem { background: linear-gradient(135deg, #e67e22, #d35400); box-shadow: 0 6px 0 #a34000; } /* 기존 버튼 색 계승 */
+        #btn-prem { background: linear-gradient(135deg, #e67e22, #d35400); box-shadow: 0 6px 0 #a34000; }
 
         .btn-gacha-text { font-size: 1.2rem; }
         .cost-label { font-size: 0.8rem; font-weight: bold; opacity: 0.9; font-family: 'Noto Sans KR'; }
@@ -209,6 +229,8 @@
         @keyframes popIn { to { transform: scale(1); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-50px); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(214, 48, 49, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(214, 48, 49, 0); } 100% { box-shadow: 0 0 0 0 rgba(214, 48, 49, 0); } }
+        @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 10% { transform: translate(-1px, -2px) rotate(-1deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 30% { transform: translate(3px, 2px) rotate(0deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 50% { transform: translate(-1px, 2px) rotate(-1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 70% { transform: translate(3px, 1px) rotate(-1deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 90% { transform: translate(1px, 2px) rotate(0deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
     </style>
 </head>
 <body>
@@ -233,7 +255,7 @@
     <div class="altar-area">
         <div class="altar-title">
             <span>🔮 영혼 융합 (세탁기)</span>
-            <span style="font-size:0.7rem; color:#888;">2명 선택하여 합체</span>
+            <span style="font-size:0.7rem; color:#888;">2명 선택하여 진화</span>
         </div>
         <div class="altar-slots">
             <div id="slot-1" class="altar-slot">선택1</div>
@@ -263,14 +285,20 @@
     </main>
 
     <footer>
-        <button id="btn-norm" class="btn-gacha" onclick="game.pull('normal')">
-            <span class="btn-gacha-text">일반</span>
-            <span id="cost-norm" class="cost-label">100 CP</span>
-        </button>
-        <button id="btn-prem" class="btn-gacha" onclick="game.pull('premium')">
-            <span class="btn-gacha-text">🔥 고급 인력</span>
-            <span id="cost-prem" class="cost-label">1000 CP</span>
-        </button>
+        <div class="utility-bar">
+            <button class="util-btn btn-pizza" onclick="game.buyPizza()">🍕 피자 돌리기 (500)</button>
+            <button class="util-btn btn-fever" onclick="game.triggerFever()">🔥 실베 보내기 (위험)</button>
+        </div>
+        <div class="gacha-bar">
+            <button id="btn-norm" class="btn-gacha" onclick="game.pull('normal')">
+                <span class="btn-gacha-text">일반</span>
+                <span id="cost-norm" class="cost-label">100 CP</span>
+            </button>
+            <button id="btn-prem" class="btn-gacha" onclick="game.pull('premium')">
+                <span class="btn-gacha-text">🔥 고급 인력</span>
+                <span id="cost-prem" class="cost-label">1000 CP</span>
+            </button>
+        </div>
     </footer>
 
     <div id="overlay" class="overlay">
@@ -288,7 +316,6 @@
     </div>
 
 <script>
-// DB 복구: 원래의 찰진 멘트들
 const DB = {
     jobs: {
         N: ['눈팅족', '개추봇', '댓글러', '유동', '질문충', '핑프', '복붙러'],
@@ -298,28 +325,37 @@ const DB = {
         UR: ['초월자', '갤러리주인', '황금고닉', '운영자'],
         F: ['분탕충', '타갤첩자', '좆목대장', '권력남용', '컨셉충', '네임드호소인']
     },
+    traits: [
+        { id: 'workaholic', name: '일중독', eff: 'CP +50%' },
+        { id: 'troll', name: '관종', eff: '로그 발생↑' },
+        { id: 'tank', name: '멘탈갑', eff: '해고 스트레스↓' },
+        { id: 'rich', name: '금수저', eff: '비용 할인' },
+        { id: 'psycho', name: '광기', eff: '변수 창출' }
+    ],
     logs: {
         work: [ "야짤 컷", "VPN 차단", "할카스 제거", "주작기 차단", "실베 방어", "매크로 차단", "광고글 삭제", "유입 질문 답변" ],
         fight: [ "패드립 시전", "현피 신청", "고닉 고로시", "뒷담화 적발", "통매음 고소", "완장질" ],
         idle: [ "자는 중", "라면 먹음", "눈팅 중", "똥 싸는 중", "롤 하는 중", "유튜브 시청" ],
         chaos: [ "타갤 침공!", "주작기 가동!", "야짤 달리는 중", "유입 폭주", "횡령 적발", "좆목질 포착" ]
     },
-    power: { N:2, R:6, SR:15, SSR:40, UR:100, F:-15 } // 융합 계산용
+    power: { N:2, R:6, SR:15, SSR:40, UR:100, F:-15 }
 };
 
-const SAVE_KEY = "pasdak_v30_final_fix";
+const SAVE_KEY = "pasdak_v31_evo";
 
 class Game {
     constructor() {
         this.cp = 500;
         this.stress = 0;
         this.pasdaks = [];
-        this.maxSlots = 12; // 융합이 생겼으니 슬롯 약간 줄임
+        this.maxSlots = 12;
         this.isOver = false;
         
-        this.selected = []; // 융합 선택용
+        this.selected = [];
         this.costNorm = 100;
         this.costPrem = 1000;
+        
+        this.feverTimer = 0; // 실베 타임 타이머
 
         this.ui = {
             cp: document.getElementById('ui-cp'),
@@ -366,13 +402,33 @@ class Game {
     }
 
     hardReset() {
-        if(confirm("정말 초기화 하시겠습니까?")) {
+        if(confirm("초기화 하시겠습니까?")) {
             this.isOver = true; 
             localStorage.removeItem(SAVE_KEY);
             location.reload();
         }
     }
 
+    // --- Utility Functions ---
+    buyPizza() {
+        if(this.cp < 500) { alert("CP가 부족합니다."); return; }
+        if(this.stress <= 0) { alert("이미 민심이 좋습니다."); return; }
+        this.cp -= 500;
+        this.stress = Math.max(0, this.stress - 20);
+        this.log("🍕 [피자] 도미노 피자 5판을 돌렸습니다. 민심 회복 완료.", "l-work");
+        this.updateUI();
+    }
+
+    triggerFever() {
+        if(this.feverTimer > 0) return;
+        if(confirm("실시간 베스트(실베)로 글을 보냅니다.\n수익이 3배가 되지만, 스트레스가 급증합니다. 진행합니까?")) {
+            this.feverTimer = 15; // 15초 지속
+            this.log("🔥 [실베] 갤러리가 실시간 베스트에 노출되었습니다! 유입 폭주!", "l-chaos");
+            document.body.style.animation = "shake 0.5s infinite";
+        }
+    }
+
+    // --- Core Game Logic ---
     pull(type) {
         if(this.isOver) return;
         let cost = type === 'premium' ? this.costPrem : this.costNorm;
@@ -387,14 +443,12 @@ class Game {
         let realRank = 'N';
         
         if(type === 'premium') {
-             // 고급: UR, SSR 확률 높음
             if(r < 5) realRank = 'UR';
             else if(r < 25) realRank = 'SSR';
             else if(r < 65) realRank = 'SR';
             else if(r < 95) realRank = 'R';
             else realRank = 'F'; 
         } else {
-             // 일반: F급 확률 높음 (원래 맛 살림)
             if(r < 2) realRank = 'SSR';      
             else if(r < 32) realRank = 'F';  
             else if(r < 42) realRank = 'SR'; 
@@ -406,8 +460,6 @@ class Game {
         const job = jobList[Math.floor(Math.random() * jobList.length)];
         const name = (Math.random()<0.5?'유동':'고닉') + Math.floor(Math.random()*9999);
         
-        // 기존 코드의 Power/Chaos 로직 유지
-        let power = DB.power[realRank];
         let chaos = 5;
         if(realRank === 'SSR' || realRank === 'UR') chaos = 0;
         else if(realRank === 'SR') chaos = 5;
@@ -422,11 +474,12 @@ class Game {
             job: '수습 완장', 
             realJob: job, 
             power: 5, 
-            realPower: power, 
+            realPower: DB.power[realRank], 
             chaos: chaos, 
             revealed: false,
             revealTimer: type==='premium' ? 3 : 8,
-            lv: 1, exp: 0 // 성장 시스템 추가
+            lv: 1, exp: 0,
+            trait: null // 특성 없음
         };
 
         this.pasdaks.push(p);
@@ -437,7 +490,6 @@ class Game {
         this.saveGame();
     }
 
-    // 융합 관련 함수
     toggleSelect(id) {
         if(this.isOver) return;
         const idx = this.selected.indexOf(id);
@@ -446,23 +498,21 @@ class Game {
             if(this.selected.length >= 2) this.selected.shift();
             this.selected.push(id);
         }
-        this.renderSlots(); // 선택 효과 갱신
+        this.renderSlots();
         this.updateAltar();
     }
 
     updateAltar() {
         const p1 = this.pasdaks.find(p => p.id === this.selected[0]);
         const p2 = this.pasdaks.find(p => p.id === this.selected[1]);
-
         this.ui.slot1.className = p1 ? `altar-slot filled` : `altar-slot`;
         this.ui.slot1.innerText = p1 ? `[${p1.displayRank}]` : "선택1";
-        
         this.ui.slot2.className = p2 ? `altar-slot filled` : `altar-slot`;
         this.ui.slot2.innerText = p2 ? `[${p2.displayRank}]` : "선택2";
-
         this.ui.btnFuse.disabled = this.selected.length !== 2 || this.cp < 300;
     }
 
+    // --- 융합 시스템 개편 (Evolution) ---
     fuse() {
         if(this.selected.length !== 2 || this.cp < 300) return;
         this.cp -= 300;
@@ -474,27 +524,58 @@ class Game {
         this.pasdaks = this.pasdaks.filter(p => !this.selected.includes(p.id));
         this.selected = [];
 
-        // 융합 로직 (간단화)
-        const scoreMap = {N:1, R:2, SR:3, SSR:4, UR:5, F:0};
-        const s1 = scoreMap[p1.revealed ? p1.realRank : 'N'];
-        const s2 = scoreMap[p2.revealed ? p2.realRank : 'N'];
-        const avg = (s1 + s2) / 2;
-        
-        const r = Math.random();
+        // 랭크 계산
+        const ranks = ['N', 'R', 'SR', 'SSR', 'UR', 'F'];
         let newRank = 'N';
-        
-        if (r < 0.15) newRank = 'F'; 
-        else if (r < 0.25 && avg >= 4) newRank = 'UR';
-        else if (avg >= 3.5) newRank = 'SSR';
-        else if (avg >= 2.5) newRank = 'SR';
-        else if (avg >= 1.5) newRank = 'R';
-        else newRank = 'N';
+
+        // 1. 동급 융합 (승급 로직)
+        if (p1.realRank === p2.realRank && p1.realRank !== 'UR') {
+            const idx = ranks.indexOf(p1.realRank);
+            
+            // F+F 히든 조합 (1% 각성)
+            if(p1.realRank === 'F') {
+                if(Math.random() < 0.01) {
+                    newRank = 'UR';
+                    this.log(`😱 [대사건] 심연의 분탕들이 융합하여 [UR]로 각성했습니다!!!`, 'l-chaos');
+                } else {
+                    newRank = 'F'; // 99% 확률로 그냥 F
+                }
+            } 
+            else {
+                // 일반 승급 (70% 성공, 30% 유지)
+                if (Math.random() < 0.7 && idx < 4) { // UR 전까지만
+                    newRank = ranks[idx + 1];
+                } else {
+                    newRank = p1.realRank;
+                }
+            }
+        } 
+        // 2. 이종 융합 (평균 회귀)
+        else {
+            const scoreMap = {N:1, R:2, SR:3, SSR:4, UR:5, F:0};
+            const s1 = scoreMap[p1.revealed ? p1.realRank : 'N'];
+            const s2 = scoreMap[p2.revealed ? p2.realRank : 'N'];
+            const avg = (s1 + s2) / 2;
+            
+            if (Math.random() < 0.1) newRank = 'F'; // 10% 융합 실패
+            else if (avg >= 4) newRank = 'UR';
+            else if (avg >= 3.5) newRank = 'SSR';
+            else if (avg >= 2.5) newRank = 'SR';
+            else if (avg >= 1.5) newRank = 'R';
+            else newRank = 'N';
+        }
+
+        // 특성 부여 (20% 확률)
+        let newTrait = null;
+        if(Math.random() < 0.3) {
+            newTrait = DB.traits[Math.floor(Math.random() * DB.traits.length)];
+        }
 
         const jobList = DB.jobs[newRank];
         const newP = {
             id: Math.random().toString(36).substr(2,9),
             realRank: newRank,
-            displayRank: newRank, // 융합체는 바로 공개
+            displayRank: newRank, 
             name: "키메라" + Math.floor(Math.random()*99),
             job: jobList[Math.floor(Math.random()*jobList.length)],
             realJob: jobList[Math.floor(Math.random()*jobList.length)],
@@ -503,16 +584,18 @@ class Game {
             chaos: newRank==='F'?70:5,
             revealed: true,
             revealTimer: 0,
-            lv: 1, exp: 0
+            lv: 1, exp: 0,
+            trait: newTrait
         };
         this.pasdaks.push(newP);
         
-        const logType = newRank === 'UR' ? 'l-ur' : (newRank === 'F' ? 'l-ban' : 'l-sys');
-        this.log(`🧬 [융합] ${p1.name} + ${p2.name} → [${newRank}] ${newP.name}`, logType);
+        let logMsg = `🧬 [융합] ${p1.name} + ${p2.name} → [${newRank}] ${newP.name}`;
+        if(newTrait) logMsg += ` (${newTrait.name})`;
         
-        if(newRank === 'UR') {
-            this.showPop({name: newP.name, realRank: 'UR'}, false);
-        }
+        const logType = newRank === 'UR' ? 'l-ur' : (newRank === 'F' ? 'l-ban' : 'l-sys');
+        this.log(logMsg, logType);
+        
+        if(newRank === 'UR') this.showPop({name: newP.name, realRank: 'UR'}, false);
         
         this.renderSlots();
         this.updateAltar();
@@ -524,13 +607,16 @@ class Game {
         const idx = this.pasdaks.findIndex(p => p.id === id);
         if(idx > -1) {
             const p = this.pasdaks[idx];
+            
+            let stressReduc = 2;
+            if(p.trait && p.trait.id === 'tank') stressReduc = 5; // 멘탈갑 특성
+
             this.log(`🚫 [해고] ${p.name} (${p.revealed ? p.realRank : '???'}) 방출됨.`, 'l-ban');
             this.createFloatText("해고", `card-${p.id}`, "#aaa");
             
             this.pasdaks.splice(idx, 1);
-            this.selected = this.selected.filter(sid => sid !== id); // 선택중이면 해제
-            
-            this.stress = Math.max(0, this.stress - 2); // 해고하면 스트레스 약간 감소
+            this.selected = this.selected.filter(sid => sid !== id);
+            this.stress = Math.max(0, this.stress - stressReduc);
             
             this.renderSlots();
             this.updateAltar();
@@ -544,6 +630,16 @@ class Game {
 
         let totalGain = 0;
         const isMentalBreakdown = this.stress >= 80;
+        
+        // 피버 타임 처리
+        if(this.feverTimer > 0) {
+            this.feverTimer--;
+            this.stress += 1.5; // 피버 중 스트레스 급증
+            if(this.feverTimer <= 0) {
+                document.body.style.animation = "none";
+                this.log("💤 [실베] 실베 타임 종료. 갤러리가 진정되었습니다.", "l-sys");
+            }
+        }
 
         this.pasdaks.forEach(p => {
             if (!p.revealed) {
@@ -551,35 +647,35 @@ class Game {
                 if (p.revealTimer <= 0) this.revealIdentity(p);
             }
 
-            // 성장 시스템 (Code 2에서 가져옴)
+            // 성장
             p.exp++;
             if(p.exp >= p.lv * 20) {
                 p.lv++; p.exp = 0;
                 if(Math.random() < 0.2) this.createFloatText("Lv UP!", `card-${p.id}`, "#2ecc71");
             }
 
-            // CP 생산 (레벨 반영)
+            // 생산력 계산 (특성 반영)
             let currentPower = p.realPower + (p.lv * 2); 
-            if(p.realRank === 'F') currentPower = -15; // F급은 레벨 오르면 손해 더 커짐
+            if(p.realRank === 'F') currentPower = -15; 
+            
+            if(p.trait && p.trait.id === 'workaholic') currentPower = Math.floor(currentPower * 1.5);
+            if(this.feverTimer > 0 && currentPower > 0) currentPower *= 3; // 피버 3배
 
-            // 상태 로그 업데이트 (Code 1의 찰진 로그)
+            // 행동 로직
             const roll = Math.random() * 100;
             let currentChaos = p.chaos;
             if (isMentalBreakdown && ['SSR','SR'].includes(p.realRank)) currentChaos = 50; 
+            if (p.trait && p.trait.id === 'psycho') currentChaos += 10;
 
-            // 협동 이벤트 체크
             let handled = false;
-            if (p.revealed && Math.random() < 0.03) { 
-                handled = this.handleCoop(p);
-            }
+            if (p.revealed && Math.random() < 0.03) handled = this.handleCoop(p);
 
             if (!handled) {
                 if (roll < currentChaos / 4) {
                     this.triggerEvent(p, isMentalBreakdown);
                 } else {
                     totalGain += currentPower;
-                    // 가끔 텍스트 업데이트
-                    if (Math.random() < 0.05) {
+                    if (Math.random() < (p.trait?.id==='troll'?0.15:0.05)) { // 관종 특성은 로그 자주
                         const type = currentPower > 0 ? 'work' : 'idle';
                         const txt = DB.logs[type][Math.floor(Math.random()*DB.logs[type].length)];
                         const el = document.getElementById(`st-${p.id}`);
@@ -594,23 +690,26 @@ class Game {
 
         this.cp += totalGain;
         
-        // 스트레스 로직
+        // 스트레스 계산
         const fCount = this.pasdaks.filter(p => p.realRank === 'F' && p.revealed).length;
         let stressInc = fCount * 0.4; 
         if (totalGain < 0) stressInc += 0.5;
-        if (totalGain > 100) stressInc -= 0.1; // 돈 잘 벌리면 스트레스 감소
+        if (totalGain > 150) stressInc -= 0.1; 
         
         this.stress = Math.min(100, Math.max(0, this.stress + stressInc));
 
         if (this.stress >= 100) {
             this.isOver = true;
+            document.body.style.animation = "none";
             document.getElementById('gameover').style.display = 'flex';
         }
 
-        // Ticker 업데이트
         if(isMentalBreakdown) {
              this.ui.ticker.innerText = "🚨 경고: 멘탈 붕괴! 파딱들이 미쳐 날뛰고 있습니다! 🚨";
              this.ui.ticker.style.color = "red";
+        } else if (this.feverTimer > 0) {
+             this.ui.ticker.innerText = `🔥 실베 점령 중! 수익 3배! (남은 시간: ${this.feverTimer}초)`;
+             this.ui.ticker.style.color = "#ff7675";
         } else if(Math.random() < 0.02) {
             const msgs = ["야갤 침공 경보", "서버 불안정", "알바가 혐짤 삭제", "실베 등극", "유입 폭주 중"];
             this.ui.ticker.innerText = "속보: " + msgs[Math.floor(Math.random()*msgs.length)];
@@ -640,7 +739,7 @@ class Game {
                     if (fTargets.length > 0) {
                         const target = fTargets[0];
                         this.log(`⚖️ [숙청] ${p.name}: 숨어있던 분탕 ${target.name} 색출!`, 'l-coop-good');
-                        this.kick(null, target.id); // 자동 해고
+                        this.kick(null, target.id);
                         return true;
                     }
                 }
@@ -659,7 +758,7 @@ class Game {
         p.displayRank = p.realRank;
         p.job = p.realJob;
         this.renderSlots();
-        this.updateAltar(); // 랭크 공개됐으니 제단도 업데이트
+        this.updateAltar(); 
         
         let msgType = 'l-sys';
         if(p.realRank === 'SSR' || p.realRank === 'UR') msgType = 'l-get';
@@ -673,7 +772,6 @@ class Game {
         const r = Math.random();
         
         if (p.realRank === 'F' && p.revealed && r < 0.3) {
-            // F급의 테러 (무고 밴)
             if(this.pasdaks.length > 1) {
                 const targets = this.pasdaks.filter(t => t.id !== p.id && t.realRank !== 'F');
                 if(targets.length > 0) {
@@ -684,7 +782,6 @@ class Game {
             }
         } 
         else if (r < 0.4) { 
-            // 싸움
             const fightMsg = DB.logs.fight[Math.floor(Math.random()*DB.logs.fight.length)];
             this.log(`🥊 [전투] ${p.name}: ${fightMsg}`, 'l-ban');
             const st = document.getElementById(`st-${p.id}`);
@@ -692,7 +789,6 @@ class Game {
             this.stress += 3;
         }
         else {
-            // 사고
             const chaosMsg = DB.logs.chaos[Math.floor(Math.random()*DB.logs.chaos.length)];
             const st = document.getElementById(`st-${p.id}`);
             if(st) { st.innerText = chaosMsg; st.style.color = "#ff6b6b"; }
@@ -710,9 +806,12 @@ class Game {
             
             d.className = `card ${rankClass} ${isSel ? 'selected' : ''}`;
             d.id = `card-${p.id}`;
-            
-            // 융합 선택 기능 추가
             d.onclick = () => this.toggleSelect(p.id);
+
+            let traitHtml = '';
+            if(p.revealed && p.trait) {
+                traitHtml = `<span class="trait-badge">${p.trait.name}</span>`;
+            }
 
             d.innerHTML = `
                 <div class="c-top">
@@ -720,7 +819,7 @@ class Game {
                     <button class="btn-fire" onclick="window.game.kick(event, '${p.id}')">해고</button>
                 </div>
                 <div class="c-name">${p.name}</div>
-                <div class="c-info">${p.job} <span style="font-size:0.7rem; color:#666;">Lv.${p.lv}</span></div>
+                <div class="c-info">${traitHtml}${p.job} <span style="font-size:0.7rem; color:#666;">Lv.${p.lv}</span></div>
                 <div class="c-status" id="st-${p.id}">${p.revealed ? '대기 중' : '심사 중...'}</div>
             `;
             this.ui.grid.appendChild(d);
@@ -747,7 +846,7 @@ class Game {
     }
 
     showPop(p, isHidden=true) {
-        if(isHidden && p.realRank !== 'UR') { // UR은 바로 공개되거나 다르게 처리 가능하지만 일단 통일
+        if(isHidden && p.realRank !== 'UR') { 
             this.ui.popRank.innerText = "???";
             this.ui.popRank.style.color = "#fff";
             this.ui.popName.innerText = p.name;
@@ -755,7 +854,6 @@ class Game {
             this.ui.popCard.style.border = "4px dashed #777";
             this.ui.popCard.style.boxShadow = "none";
         } else {
-            // UR이거나 융합체일 경우
             const colors = {UR:'#00cec9', SSR:'#f1c40f', SR:'#9b59b6'};
             const color = colors[p.realRank] || '#fff';
             this.ui.popRank.innerText = p.realRank;
