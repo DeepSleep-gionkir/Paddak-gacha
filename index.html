@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>무한 파딱 가챠</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>무한 파딱 가챠: 스크롤 버전</title>
     <style>
         :root {
             --bg: #121212; --panel: #1e1e1e;
@@ -16,95 +16,100 @@
         body {
             margin: 0; padding: 0; background: var(--bg); color: var(--text);
             font-family: 'Pretendard', sans-serif;
-            width: 100vw; height: 100vh; /* Viewport Fix */
-            display: flex; flex-direction: column; overflow: hidden;
+            /* 중요: 높이 제한 해제하고 스크롤 허용 */
+            min-height: 100vh;
+            overflow-y: auto; 
+            padding-bottom: 120px; /* 버튼이 가리지 않게 하단 여백 확보 */
         }
 
-        /* 1. HEADER */
+        /* 1. Header */
         header {
-            flex: 0 0 auto; background: #000; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;
-            z-index: 10;
+            background: #000; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; padding: 15px;
+            position: sticky; top: 0; z-index: 50; /* 스크롤 내려도 헤더 고정 */
         }
         .res-box { display: flex; align-items: center; gap: 8px; font-weight: bold; }
-        .cp-val { color: var(--legend); font-size: 1.1rem; text-shadow: 0 0 5px rgba(241,196,15,0.4); }
+        .cp-val { color: var(--legend); font-size: 1.2rem; text-shadow: 0 0 5px rgba(241,196,15,0.4); }
         .stress-bg { width: 100px; height: 10px; background: #333; border-radius: 5px; overflow: hidden; }
         .stress-fill { height: 100%; width: 0%; background: var(--danger); transition: width 0.3s; }
 
         /* News Ticker */
         .ticker-wrap {
-            flex: 0 0 24px; background: #080808; border-bottom: 1px solid var(--border);
-            overflow: hidden; display: flex; align-items: center;
+            background: #080808; border-bottom: 1px solid var(--border);
+            overflow: hidden; display: flex; align-items: center; height: 30px;
         }
         .ticker {
             white-space: nowrap; animation: ticker 20s linear infinite;
-            padding-left: 100%; color: var(--accent); font-size: 0.8rem;
+            padding-left: 100%; color: var(--accent); font-size: 0.9rem;
         }
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* 2. MAIN (Split View) */
-        main {
-            flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative;
-        }
+        /* 2. Main Sections */
+        main { padding: 15px; display: flex; flex-direction: column; gap: 15px; }
 
-        /* Top: Slots */
+        /* Slots Section */
         #section-slots {
-            flex: 1; /* 가변 높이 */
-            overflow-y: auto; padding: 10px; background: var(--bg);
-            border-bottom: 2px solid var(--border);
+            background: var(--bg);
         }
-        .slot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-bottom: 20px; }
+        .slot-grid { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; 
+            min-height: 300px; /* 최소 높이 확보 */
+        }
         .card {
-            background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 8px;
-            position: relative; display: flex; flex-direction: column; gap: 4px;
-            transition: 0.2s;
+            background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px;
+            position: relative; display: flex; flex-direction: column; gap: 5px;
+            transition: 0.2s; min-height: 100px;
         }
-        .card.SSR { border: 1px solid var(--legend); background: radial-gradient(circle at top right, #332b00, var(--panel)); }
-        .card.F { border: 1px solid var(--danger); background: #2a0e0e; }
+        .card.SSR { border: 2px solid var(--legend); background: radial-gradient(circle at top right, #332b00, var(--panel)); }
+        .card.F { border: 2px solid var(--danger); background: #2a0e0e; }
         
         .c-header { display: flex; justify-content: space-between; align-items: center; }
-        .c-rank { font-size: 0.7rem; font-weight: 900; padding: 2px 6px; border-radius: 4px; color: #000; background: #aaa; }
+        .c-rank { font-size: 0.8rem; font-weight: 900; padding: 2px 6px; border-radius: 4px; color: #000; background: #aaa; }
         .c-rank.SSR { background: var(--legend); } .c-rank.SR { background: var(--epic); }
         .c-rank.F { background: var(--danger); color: #fff; }
         
-        .c-name { font-weight: bold; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .c-job { font-size: 0.75rem; color: #aaa; }
-        .c-trait { font-size: 0.7rem; color: var(--accent); }
-        .c-status { font-size: 0.7rem; color: #666; margin-top: 4px; min-height: 14px; }
+        .c-name { font-weight: bold; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .c-info { font-size: 0.8rem; color: #aaa; }
+        .c-trait { font-size: 0.8rem; color: var(--accent); }
+        .c-status { font-size: 0.8rem; color: #666; margin-top: auto; min-height: 16px; font-weight:bold;}
         
-        .btn-fire { background: #333; color: #fff; border: none; border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; }
+        .btn-fire { background: #444; color: #fff; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.8rem; cursor: pointer; }
         .btn-fire:active { background: var(--danger); }
 
-        /* Bottom: Logs */
+        /* Logs Section */
         #section-logs {
-            flex: 0 0 40%; /* 화면의 40% 고정 */
-            background: #000; overflow-y: auto; padding: 10px;
-            font-family: 'D2Coding', monospace; font-size: 0.8rem; line-height: 1.5;
-            border-top: 1px solid var(--border);
+            background: #000; padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+            font-family: 'D2Coding', monospace; font-size: 0.85rem; line-height: 1.5;
+            height: 250px; /* 고정 높이 */
+            overflow-y: auto;
         }
         .log { margin-bottom: 3px; border-bottom: 1px solid #1a1a1a; padding-bottom: 2px; }
         .l-get { color: var(--legend); } .l-ban { color: var(--danger); } .l-chat { color: var(--rare); }
 
-        /* 3. FOOTER (Fixed Button) */
+        /* 3. Footer (Fixed Bottom) */
         footer {
-            flex: 0 0 auto; background: var(--panel); border-top: 1px solid var(--border);
-            padding: 10px; display: flex; justify-content: center;
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(18, 18, 18, 0.95); border-top: 1px solid var(--border);
+            padding: 15px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); /* 아이폰 하단 바 대응 */
+            display: flex; justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(5px);
         }
         #gacha-btn {
-            width: 100%; height: 60px;
+            width: 100%; max-width: 500px; height: 60px;
             background: linear-gradient(135deg, #e67e22, #d35400);
             color: white; border: none; border-radius: 12px;
-            font-size: 1.2rem; font-weight: 900; cursor: pointer;
+            font-size: 1.3rem; font-weight: 900; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             box-shadow: 0 4px 0 #a04000; transition: 0.1s;
         }
         #gacha-btn:active { transform: translateY(4px); box-shadow: none; }
         #gacha-btn:disabled { filter: grayscale(1); opacity: 0.5; transform: translateY(4px); box-shadow: none; }
-        .cost-label { font-size: 0.8rem; font-weight: normal; opacity: 0.9; margin-top: 2px; }
+        .cost-label { font-size: 0.85rem; font-weight: normal; opacity: 0.9; margin-top: 2px; }
 
         /* Effects */
         .overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999;
             display: none; justify-content: center; align-items: center; flex-direction: column;
             pointer-events: none;
         }
@@ -117,18 +122,18 @@
         }
         .float-txt {
             position: absolute; font-weight: bold; pointer-events: none; z-index: 50;
-            text-shadow: 1px 1px 0 #000; animation: floatUp 0.8s forwards;
+            text-shadow: 1px 1px 0 #000; animation: floatUp 0.8s forwards; font-size: 1.2rem;
         }
 
         #gameover {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 999;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000;
             display: none; justify-content: center; align-items: center; flex-direction: column;
             pointer-events: auto;
         }
 
         @keyframes popIn { to { transform: scale(1); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-50px); } }
 
     </style>
 </head>
@@ -138,8 +143,8 @@
         <div class="res-box">
             💎 <span id="ui-cp" class="cp-val">0</span>
         </div>
-        <div class="res-box" style="font-size:0.8rem; color:#aaa;">
-            멘탈
+        <div class="res-box" style="font-size:0.9rem; color:#aaa; flex-direction:column; align-items:flex-end; gap:2px;">
+            <span>갤러리 멘탈</span>
             <div class="stress-bg"><div id="ui-stress" class="stress-fill"></div></div>
         </div>
     </header>
@@ -150,15 +155,22 @@
 
     <main>
         <section id="section-slots">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.8rem; color:#888;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.9rem; color:#888;">
                 <span>파딱 라인업 (<span id="ui-count">0</span>/6)</span>
-                <span>클릭하여 정보/해고</span>
+                <span>클릭하여 해고</span>
             </div>
-            <div id="slot-grid" class="slot-grid"></div>
+            <div id="slot-grid" class="slot-grid">
+                <div style="grid-column: span 2; text-align:center; padding: 40px; color:#555;">
+                    아래 버튼을 눌러 파딱을 소환하세요.
+                </div>
+            </div>
         </section>
 
-        <section id="section-logs">
-            <div class="log l-sys">시스템 정상 가동 중.</div>
+        <section>
+            <div style="color:#888; font-size:0.9rem; margin-bottom:5px;">활동 로그</div>
+            <div id="section-logs">
+                <div class="log l-sys">시스템 정상 가동 중.</div>
+            </div>
         </section>
     </main>
 
@@ -186,7 +198,6 @@
 <script>
 /* ================= DATA BASE ================= */
 const DB = {
-    ranks: ['N', 'R', 'SR', 'SSR', 'F'],
     jobs: {
         N: ['눈팅족', '개추봇', '댓글러', '유동', '질문충'],
         R: ['짤쟁이', '번역핫산', '정보게이', '뉴스봇', '리뷰어'],
@@ -196,16 +207,16 @@ const DB = {
     },
     traits: {
         SSR: [
-            { t:"🤖AI방어", desc:"스트레스 감소", eff:(g)=>{ g.stress -= 0.5; } },
+            { t:"🤖AI방어", desc:"스트레스 감소", eff:(g)=>{ g.stress -= 0.3; } },
             { t:"💰금수저", desc:"CP 획득량 2배", eff:(g)=>{ g.tempMult = 2; } },
             { t:"🛡️절대방어", desc:"분탕 자동 차단", eff:(g)=>{ /* Logic handled in fight */ } }
         ],
         F: [
-            { t:"💣트롤", desc:"스트레스 유발", eff:(g)=>{ g.stress += 0.5; } },
-            { t:"💸횡령", desc:"CP 감소", eff:(g)=>{ g.cp -= 5; } },
+            { t:"💣트롤", desc:"스트레스 유발", eff:(g)=>{ g.stress += 0.3; } },
+            { t:"💸횡령", desc:"CP 감소", eff:(g)=>{ g.cp -= 2; } },
             { t:"🔪반란", desc:"아군 해고", eff:(g)=>{ /* Logic handled in fight */ } }
         ],
-        Normal: [ // For others
+        Normal: [
             { t:"성실함", desc:"CP 소폭 증가", eff:(g)=>{ g.cp += 1; } },
             { t:"게으름", desc:"가끔 쉼", eff:(g)=>{ /* Idle logic */ } },
             { t:"다혈질", desc:"싸움 확률 증가", eff:(g)=>{ /* Fight logic */ } }
@@ -221,7 +232,7 @@ const DB = {
 /* ================= GAME LOGIC ================= */
 class Game {
     constructor() {
-        this.cp = 300; // 넉넉한 초기 자금
+        this.cp = 200; 
         this.stress = 0;
         this.cost = 100;
         this.pasdaks = [];
@@ -248,18 +259,17 @@ class Game {
         setInterval(() => this.tick(), 1000);
     }
 
-    /* --- Action: Gacha --- */
     pull() {
         if(this.cp < this.cost || this.pasdaks.length >= this.maxSlots) return;
 
         this.cp -= this.cost;
-        this.cost = Math.floor(this.cost * 1.3); // Inflation
+        this.cost = Math.floor(this.cost * 1.3);
 
         // Rank Probability
         const r = Math.random()*100;
         let rank = 'N';
         if(r < 5) rank = 'SSR';      // 5%
-        else if(r < 15) rank = 'F';  // 10% (Trap)
+        else if(r < 15) rank = 'F';  // 10%
         else if(r < 30) rank = 'SR'; // 15%
         else if(r < 60) rank = 'R';  // 30%
 
@@ -267,7 +277,6 @@ class Game {
         const job = DB.jobs[rank][Math.floor(Math.random()*DB.jobs[rank].length)];
         const name = (Math.random()<0.5?'유동':'고닉') + Math.floor(Math.random()*999);
         
-        // Trait Generation
         let traitObj = { t:"평범", desc:"", eff:()=>{} };
         if(rank === 'SSR') traitObj = DB.traits.SSR[Math.floor(Math.random()*DB.traits.SSR.length)];
         else if(rank === 'F') traitObj = DB.traits.F[Math.floor(Math.random()*DB.traits.F.length)];
@@ -287,20 +296,18 @@ class Game {
         this.updateUI();
     }
 
-    /* --- Action: Fire --- */
     fire(id) {
         const idx = this.pasdaks.findIndex(p => p.id === id);
         if(idx > -1) {
             const p = this.pasdaks[idx];
             this.log(`${p.name}을(를) 해고했습니다.`, 'l-ban');
             this.pasdaks.splice(idx, 1);
-            this.cost = Math.max(100, Math.floor(this.cost * 0.9)); // Reduce cost slightly
+            this.cost = Math.max(100, Math.floor(this.cost * 0.9)); 
             this.renderSlots();
             this.updateUI();
         }
     }
 
-    /* --- Game Loop --- */
     tick() {
         if(this.isOver) return;
 
@@ -308,21 +315,16 @@ class Game {
         let totalGain = 0;
         let activeWorkers = 0;
 
-        // 1. Trait & Work Phase
         this.pasdaks.forEach(p => {
-            // Apply Passive Trait Effect
             p.trait.eff(this); 
 
-            // Action: Work or Fight
             if(Math.random()*100 < p.chaos && this.pasdaks.length > 1) {
                 this.fight(p);
             } else {
-                // Work
                 activeWorkers++;
                 let gain = p.power * this.tempMult;
                 totalGain += gain;
                 
-                // Visual Update (Randomly)
                 if(Math.random() < 0.2) {
                     const statusEl = document.getElementById(`st-${p.id}`);
                     if(statusEl) statusEl.innerText = DB.logs.work[Math.floor(Math.random()*DB.logs.work.length)];
@@ -336,21 +338,17 @@ class Game {
 
         this.cp += totalGain;
 
-        // 2. Stress Phase
         const fCount = this.pasdaks.filter(p => p.rank === 'F').length;
-        this.stress += fCount * 1.5; // F ranks cause stress
-        if(totalGain < 0) this.stress += 1; // Losing money causes stress
+        this.stress += fCount * 1.5;
+        if(totalGain < 0) this.stress += 1;
         
-        // Natural Healing
         if(this.pasdaks.length > 0 && totalGain > 0) this.stress = Math.max(0, this.stress - 1);
         
-        // 3. Game Over Check
         if(this.stress >= 100) {
             this.isOver = true;
             document.getElementById('gameover').style.display = 'flex';
         }
 
-        // 4. Random Ticker Event
         if(Math.random() < 0.05) {
             const events = ["야갤에서 침공 옴", "서버가 불안정합니다", "알바가 혐짤을 지웠습니다", "실베 갔습니다"];
             this.ui.ticker.innerText = "속보: " + events[Math.floor(Math.random()*events.length)];
@@ -370,16 +368,18 @@ class Game {
         const st = document.getElementById(`st-${p.id}`);
         if(st) { st.innerText = "🤬 키배 뜨는 중"; st.style.color = "#e74c3c"; }
 
-        // F rank Special: Ban innocent
         if(p.rank === 'F' && Math.random() < 0.2) {
             this.log(`🚨 [${p.name}]이(가) [${target.name}]을(를) 차단했습니다!`, 'l-ban');
             this.fire(target.id);
         }
     }
 
-    /* --- Helper Functions --- */
     renderSlots() {
         this.ui.slots.innerHTML = '';
+        if(this.pasdaks.length === 0) {
+            this.ui.slots.innerHTML = '<div style="grid-column: span 2; text-align:center; padding: 40px; color:#555;">아래 버튼을 눌러 파딱을 소환하세요.</div>';
+            return;
+        }
         this.pasdaks.forEach(p => {
             const div = document.createElement('div');
             div.className = `card ${p.rank}`;
@@ -389,8 +389,7 @@ class Game {
                     <button class="btn-fire" onclick="game.fire('${p.id}')">해고</button>
                 </div>
                 <div class="c-name">${p.name}</div>
-                <div class="c-job">${p.job}</div>
-                <div class="c-trait">${p.trait.t}</div>
+                <div class="c-info">${p.job} | ${p.trait.t}</div>
                 <div class="c-status" id="st-${p.id}">대기 중...</div>
                 <div id="anc-${p.id}" style="position:absolute;top:50%;left:50%"></div>
             `;
