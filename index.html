@@ -3,208 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>무한 파딱 가챠: VISUAL MASTER</title>
+    <title>무한 파딱 가챠: V12 FINAL FIX</title>
     <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #121212; --panel: #1e1e1e;
             --accent: #e67e22; --danger: #eb4d4b; --success: #6ab04c;
-            --n-color: #95a5a6;
-            --r-color: #3498db;
-            --sr-color: #9b59b6;
-            --ssr-color: #f1c40f;
-            --f-color: #c0392b;
-            --text: #f5f6fa; --border: #333;
+            --ssr: #f1c40f; --text: #f5f6fa; --border: #333;
         }
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
         
         body {
             margin: 0; padding: 0; background: var(--bg); color: var(--text);
-            /* 폰트 변경: 제목은 둥근 Jua체, 본문은 고딕 */
             font-family: 'Noto Sans KR', sans-serif;
             min-height: 100vh; overflow-y: auto; padding-bottom: 140px;
         }
         
-        h1, h2, h3, .pop-rank, .c-rank, #gacha-btn, .res-group {
-            font-family: 'Jua', sans-serif; /* 포인트 폰트 */
+        h1, .pop-rank, .c-rank, #gacha-btn, .res-group { font-family: 'Jua', sans-serif; }
+
+        /* HEADER FIXED */
+        header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(18, 18, 18, 0.98); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;
+            backdrop-filter: blur(10px); box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
-        /* HEADER */
-        header {
-            position: sticky; top: 0; z-index: 50;
-            background: rgba(18, 18, 18, 0.95); border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center; padding: 12px 15px;
-            backdrop-filter: blur(5px); box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .cp-val { color: var(--ssr-color); font-size: 1.4rem; text-shadow: 0 0 10px rgba(241,196,15,0.3); letter-spacing: 1px; }
+        /* Left Side: CP */
+        .header-left { display: flex; align-items: center; }
+        .cp-val { color: var(--ssr); font-size: 1.3rem; text-shadow: 0 0 10px rgba(241,196,15,0.3); letter-spacing: 1px; }
+
+        /* Right Side: Mental + Reset (Flex Container) */
+        .header-right { display: flex; align-items: center; gap: 12px; }
         
         .stress-container { 
-            width: 120px; height: 14px; background: #2f3640; border-radius: 7px; 
-            overflow: hidden; position: relative; border: 1px solid #444;
+            width: 100px; height: 16px; background: #2f3640; border-radius: 8px; 
+            overflow: hidden; position: relative; border: 1px solid #555;
         }
         .stress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #e17055, #d63031); transition: width 0.3s; }
         .stress-label { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            font-size: 10px; color: #fff; text-shadow: 1px 1px 1px #000; letter-spacing: 1px;
+            font-size: 9px; color: #fff; text-shadow: 1px 1px 1px #000; letter-spacing: 1px; white-space: nowrap;
         }
         
         .reset-btn {
-            background: #2f3640; border: 1px solid #555; color: #dcdde1; 
-            padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; margin-left: 10px;
-            font-family: 'Jua', sans-serif;
+            background: #e74c3c; color: #fff; border: none; 
+            padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; 
+            cursor: pointer; font-family: 'Jua', sans-serif; white-space: nowrap;
+            box-shadow: 0 2px 0 #c0392b; transition: 0.1s;
         }
+        .reset-btn:active { transform: translateY(2px); box-shadow: none; }
 
         /* TICKER */
         .ticker-wrap {
             background: #000; border-bottom: 1px solid var(--border);
-            overflow: hidden; display: flex; align-items: center; height: 32px;
+            overflow: hidden; display: flex; align-items: center; height: 30px;
         }
         .ticker {
             white-space: nowrap; animation: ticker 25s linear infinite;
-            padding-left: 100%; color: var(--accent); font-size: 0.9rem; font-family: 'Jua', sans-serif;
+            padding-left: 100%; color: var(--accent); font-size: 0.85rem; font-family: 'Jua', sans-serif;
         }
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
         /* MAIN */
-        main { padding: 15px; display: flex; flex-direction: column; gap: 20px; }
+        main { padding: 15px; display: flex; flex-direction: column; gap: 15px; }
 
         /* SLOTS */
-        #section-slots { background: transparent; }
         .slot-header { 
-            display: flex; justify-content: space-between; margin-bottom: 10px; 
-            font-size: 1rem; color: #7f8fa6; font-family: 'Jua', sans-serif; 
+            display: flex; justify-content: space-between; margin-bottom: 8px; 
+            font-size: 0.95rem; color: #7f8fa6; font-family: 'Jua', sans-serif; 
         }
+        .slot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         
-        .slot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
-        /* CARD DESIGN (Visual Upgrade) */
+        /* CARD */
         .card {
             background: var(--panel); border: 1px solid #444; border-radius: 10px; padding: 10px;
-            position: relative; display: flex; flex-direction: column; gap: 5px; min-height: 110px;
-            transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            position: relative; display: flex; flex-direction: column; gap: 4px; min-height: 105px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
-        /* Rank Colors Borders */
-        .card.N { border-color: var(--n-color); }
-        .card.R { border-color: var(--r-color); }
-        .card.SR { border-color: var(--sr-color); background: linear-gradient(135deg, var(--panel), #251025); }
-        .card.SSR { 
-            border: 2px solid var(--ssr-color); 
-            background: radial-gradient(circle at top right, #3a3005, var(--panel)); 
-            box-shadow: 0 0 15px rgba(241,196,15,0.15);
-        }
-        .card.F { 
-            border: 2px solid var(--f-color); 
-            background: repeating-linear-gradient(45deg, #2a0e0e, #2a0e0e 10px, #1a0505 10px, #1a0505 20px); 
-        }
+        .card.SSR { border: 2px solid var(--ssr); background: radial-gradient(circle at top right, #3a3005, var(--panel)); }
+        .card.F { border: 2px solid var(--danger); background: #2a0e0e; }
         
         .c-top { display: flex; justify-content: space-between; align-items: center; }
+        .c-rank { font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; background: #555; }
+        .c-rank.SSR { background: var(--ssr); color: #000; } .c-rank.F { background: var(--danger); }
+        .c-name { font-weight: bold; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .c-info { font-size: 0.75rem; color: #aaa; }
+        .c-status { font-size: 0.75rem; color: #ccc; margin-top: auto; font-weight: bold; }
         
-        /* Rank Badges */
-        .c-rank { 
-            font-size: 0.85rem; padding: 3px 8px; border-radius: 5px; color: #fff; 
-            text-shadow: 1px 1px 0 rgba(0,0,0,0.5); box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        .btn-fire { 
+            background: #333; color: #ccc; border: 1px solid #555; 
+            border-radius: 4px; padding: 3px 8px; font-size: 0.7rem; cursor: pointer; font-family: 'Jua';
         }
-        .c-rank.N { background: var(--n-color); color: #2f3640; }
-        .c-rank.R { background: var(--r-color); }
-        .c-rank.SR { background: var(--sr-color); }
-        .c-rank.SSR { background: var(--ssr-color); color: #000; text-shadow: none; }
-        .c-rank.F { background: var(--f-color); }
-        
-        .c-name { font-weight: bold; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 5px; }
-        .c-info { font-size: 0.8rem; color: #a4b0be; }
-        .c-status { font-size: 0.8rem; color: #ced6e0; margin-top: auto; font-weight: bold; }
-        
-        .btn-kick { 
-            background: rgba(255,255,255,0.1); color: #ccc; border: 1px solid #555; 
-            border-radius: 5px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; font-family: 'Jua', sans-serif;
-        }
-        .btn-kick:active { background: var(--danger); color: white; border-color: var(--danger); }
 
         /* LOGS */
         #section-logs {
             background: #000; padding: 12px; border: 1px solid var(--border); border-radius: 10px;
-            font-family: 'D2Coding', 'Consolas', monospace; font-size: 0.85rem; line-height: 1.6;
-            height: 250px; overflow-y: auto; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            font-family: 'D2Coding', monospace; font-size: 0.8rem; line-height: 1.5;
+            height: 200px; overflow-y: auto; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
         }
-        .log { margin-bottom: 4px; border-bottom: 1px dashed #222; padding-bottom: 2px; }
-        .l-get { color: var(--ssr-color); } 
-        .l-ban { color: var(--danger); } 
-        .l-chat { color: var(--r-color); }
-        .l-event { color: var(--sr-color); font-weight: bold; }
+        .log { margin-bottom: 3px; border-bottom: 1px dashed #222; padding-bottom: 2px; }
+        .l-get { color: var(--ssr); } .l-ban { color: var(--danger); } 
 
-        /* FOOTER BUTTON */
+        /* FOOTER */
         footer {
             position: fixed; bottom: 20px; left: 0; width: 100%;
-            display: flex; justify-content: center; pointer-events: none; z-index: 100;
+            display: flex; justify-content: center; pointer-events: none; z-index: 90;
         }
         #gacha-btn {
             pointer-events: auto;
-            width: 90%; max-width: 500px; height: 70px;
+            width: 90%; max-width: 500px; height: 65px;
             background: linear-gradient(to bottom, #f39c12, #d35400);
-            color: white; border: none; border-radius: 20px;
-            font-size: 1.5rem; letter-spacing: 1px; cursor: pointer;
+            color: white; border: none; border-radius: 18px;
+            font-size: 1.4rem; letter-spacing: 1px; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 8px 0 #a04000, 0 15px 20px rgba(0,0,0,0.4); 
-            transition: 0.1s; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 0 #a04000, 0 10px 20px rgba(0,0,0,0.4); 
             border: 2px solid rgba(255,255,255,0.2);
         }
-        #gacha-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 #a04000; }
-        #gacha-btn:disabled { filter: grayscale(1); opacity: 0.7; transform: translateY(6px); box-shadow: none; }
-        .cost-label { font-size: 0.9rem; font-weight: normal; opacity: 0.9; margin-top: 2px; font-family: 'Noto Sans KR', sans-serif;}
+        #gacha-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #a04000; }
+        #gacha-btn:disabled { filter: grayscale(1); opacity: 0.7; transform: translateY(4px); box-shadow: none; }
+        .cost-label { font-size: 0.8rem; font-weight: normal; opacity: 0.9; margin-top: 2px; font-family: 'Noto Sans KR'; }
 
-        /* EFFECTS */
+        /* POPUP */
         .overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000;
             display: none; justify-content: center; align-items: center; flex-direction: column; pointer-events: none;
         }
         .overlay.active { display: flex; animation: fadeIn 0.15s forwards; }
-        
         .pop-card {
-            background: #2f3542; border-radius: 20px; padding: 40px; text-align: center; 
-            transform: scale(0.5); opacity: 0; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            box-shadow: 0 0 60px rgba(0,0,0,0.8); pointer-events: auto; min-width: 300px;
+            background: #2f3542; border-radius: 20px; padding: 30px; text-align: center; 
+            transform: scale(0.5); opacity: 0; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            box-shadow: 0 0 50px rgba(241, 196, 15, 0.5); pointer-events: auto; min-width: 280px;
+            border: 4px solid var(--ssr);
         }
-        /* Pop Card Ranks */
-        .pop-card.SSR { border: 4px solid var(--ssr-color); box-shadow: 0 0 60px rgba(241,196,15,0.4); }
-        .pop-card.F { border: 4px solid var(--f-color); }
-        .pop-card.SR { border: 4px solid var(--sr-color); }
-        .pop-card.R { border: 4px solid var(--r-color); }
-        .pop-card.N { border: 4px solid var(--n-color); }
-
-        .pop-rank { font-size: 4rem; margin-bottom: 10px; display: block; text-shadow: 3px 3px 0 rgba(0,0,0,0.3); }
-        .pop-name { font-size: 1.8rem; color: #fff; margin-bottom: 10px; font-family: 'Jua', sans-serif;}
-        .pop-desc { font-size: 1rem; color: #a4b0be; font-family: 'Noto Sans KR', sans-serif; }
-
+        .pop-rank { font-size: 3.5rem; margin-bottom: 5px; color: var(--ssr); text-shadow: 2px 2px 0 #000;}
+        .pop-name { font-size: 1.5rem; color: #fff; margin-bottom: 5px; font-family: 'Jua'; }
+        
         .float-txt {
             position: absolute; font-weight: 900; pointer-events: none; z-index: 100;
-            text-shadow: 1px 1px 0 #000; animation: floatUp 1s forwards; font-size: 1.1rem;
-            font-family: 'Jua', sans-serif;
+            text-shadow: 1px 1px 0 #000; animation: floatUp 1s forwards; font-size: 1rem;
+            font-family: 'Jua';
         }
-        
         #gameover { pointer-events: auto; background: rgba(0,0,0,0.95); }
 
         @keyframes popIn { to { transform: scale(1); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-50px); } }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="res-group">
-            💎 <span id="ui-cp" class="cp-val">0</span>
+        <div class="header-left">
+            <span class="cp-val">💎 <span id="ui-cp">0</span></span>
         </div>
-        <div class="res-group">
+        <div class="header-right">
             <div class="stress-container">
                 <div id="ui-stress" class="stress-bar"></div>
                 <div class="stress-label">MENTAL</div>
             </div>
-            <button class="reset-btn" onclick="game.hardReset()">초기화</button>
+            <button class="reset-btn" onclick="window.game.hardReset()">초기화</button>
         </div>
     </header>
 
     <div class="ticker-wrap">
-        <div class="ticker" id="ui-ticker">시스템: 비주얼 업데이트 완료. 파딱 군단을 소환하세요...</div>
+        <div class="ticker" id="ui-ticker">시스템: 저장 모듈 가동 완료. 파딱 15인 군단을 만드세요...</div>
     </div>
 
     <main>
@@ -214,15 +177,15 @@
                 <span>터치하여 해고</span>
             </div>
             <div id="slot-grid" class="slot-grid">
-                <div style="grid-column: span 2; text-align:center; padding: 60px 20px; color:#555;">
-                    <div style="font-size:3rem; margin-bottom:10px;">👻</div>
-                    데이터 로드 중...<br>또는 파딱이 없습니다.
+                <div style="grid-column: span 2; text-align:center; padding: 50px 20px; color:#555;">
+                    <div style="font-size:3rem; margin-bottom:10px;">💾</div>
+                    데이터 로드 중...
                 </div>
             </div>
         </section>
 
         <section>
-            <div style="color:#7f8fa6; font-size:0.9rem; margin-bottom:5px; font-family:'Jua';">실시간 로그</div>
+            <div style="color:#7f8fa6; font-size:0.8rem; margin-bottom:5px; font-family:'Jua';">실시간 로그</div>
             <div id="section-logs">
                 <div class="log l-sys">시스템 정상 가동.</div>
             </div>
@@ -231,59 +194,43 @@
 
     <footer>
         <button id="gacha-btn" onclick="game.pull()">
-            파딱 소환 !!
+            파딱 소환
             <span id="ui-cost" class="cost-label">100 CP</span>
         </button>
     </footer>
 
     <div id="overlay" class="overlay">
         <div id="pop-card" class="pop-card">
-            <div id="pop-rank" class="pop-rank" style="color:var(--ssr-color)">SSR</div>
+            <div id="pop-rank" class="pop-rank">SSR</div>
             <div id="pop-name" class="pop-name">전설의 파딱</div>
-            <div id="pop-desc" class="pop-desc">특성 설명</div>
+            <div id="pop-desc" style="color:#aaa; font-size:0.9rem;">특성 설명</div>
         </div>
     </div>
 
     <div id="gameover" class="overlay">
-        <h1 style="color:var(--danger); font-size:3.5rem; margin-bottom:20px; font-family:'Jua'">GAME OVER</h1>
-        <p style="color:#ccc; margin-bottom:40px; font-size:1.2rem;">갤러리가 폭파되었습니다.<br>파딱들이 전부 런했습니다.</p>
-        <button onclick="game.hardReset()" style="padding:15px 50px; border-radius:30px; border:none; background:var(--danger); color:#fff; font-weight:bold; font-size:1.3rem; cursor:pointer; font-family:'Jua'">새 지구 파기</button>
+        <h1 style="color:var(--danger); font-size:3rem; margin-bottom:20px; font-family:'Jua'">GAME OVER</h1>
+        <p style="color:#ccc; margin-bottom:40px; font-size:1.1rem;">갤러리 폭파 엔딩<br>주딱이 도망갔습니다.</p>
+        <button onclick="window.game.hardReset()" style="padding:15px 40px; border-radius:30px; border:none; background:var(--danger); color:#fff; font-weight:bold; font-size:1.2rem; cursor:pointer; font-family:'Jua'">새 지구 파기</button>
     </div>
 
 <script>
-/* ================= DATABASE ================= */
 const DB = {
     jobs: {
-        N: ['눈팅족', '개추봇', '댓글러', '유동', '질문충', '핑프', '복붙러'],
-        R: ['짤쟁이', '번역핫산', '정보게이', '뉴스봇', '리뷰어', '분석가'],
-        SR: ['24시간상주', '코드슬레이어', '새벽반', '부검전문가', '키배워리어'],
-        SSR: ['김유식조카', '서버관리자', '빛의완장', 'AI알바', '디시의현자', '마유식'],
-        F: ['분탕충', '타갤첩자', '좆목대장', '권력남용', '컨셉충', '네임드호소인']
+        N: ['눈팅족', '개추봇', '댓글러', '유동', '질문충', '핑프'],
+        R: ['짤쟁이', '번역핫산', '정보게이', '뉴스봇', '리뷰어'],
+        SR: ['24시간상주', '코드슬레이어', '새벽반', '부검전문가'],
+        SSR: ['김유식조카', '서버관리자', '빛의완장', 'AI알바', '디시의현자'],
+        F: ['분탕충', '타갤첩자', '좆목대장', '권력남용', '컨셉충']
     },
     logs: {
-        work: [
-            "광고글 삭제", "야짤 컷", "도배 차단", "할카스 제거", "실베 방어", "분탕 VPN 컷", 
-            "정보글 념글행", "공지 갱신", "유입 질문 답변", "분쟁글 중재", "낚시글 삭제",
-            "혐오 조장글 삭제", "도배기 방어", "매크로 차단", "신고글 처리"
-        ],
-        fight: [
-            "30일 차단 먹임", "저격글 작성", "과거글 털기", "신상 털기", "고소 협박", "키보드 배틀", 
-            "현피 신청", "부모님 안부 물음", "IP 추적 협박", "고닉 죽이기", "완장질 시전"
-        ],
-        idle: [
-            "갤질 중...", "F5 연타 중...", "라면 먹는 중...", "애니 보는 중...", "현타 옴", "월급 루팡 중",
-            "졸고 있음...", "딴 갤 눈팅 중...", "유튜브 보는 중...", "치킨 시키는 중..."
-        ],
-        chaos: [
-            "갤기장 만드는 중", "야짤 달리는 중", "혐짤 테러 중", "헛소리 하는 중", "정치떡밥 굴리는 중",
-            "타갤에 좌표 찍는 중", "주작기 돌리는 중", "자기 글 념글 보내는 중"
-        ]
+        work: ["광고글 삭제", "야짤 컷", "도배 차단", "할카스 제거", "실베 방어", "분탕 VPN 컷", "정보글 념글행"],
+        fight: ["30일 차단 먹임", "저격글 작성", "과거글 털기", "신상 털기", "고소 협박", "키보드 배틀"],
+        idle: ["갤질 중...", "F5 연타 중...", "라면 먹는 중...", "애니 보는 중...", "현타 옴", "월급 루팡 중"]
     }
 };
 
-const SAVE_KEY = "pasdak_save_v11_visual";
+const SAVE_KEY = "pasdak_save_v12";
 
-/* ================= LOGIC ================= */
 class Game {
     constructor() {
         this.cp = 500;
@@ -316,15 +263,9 @@ class Game {
         setInterval(() => this.tick(), 1000); 
     }
 
-    /* --- Save & Load --- */
     saveGame() {
         if(this.isOver) return;
-        const data = {
-            cp: this.cp,
-            stress: this.stress,
-            cost: this.cost,
-            pasdaks: this.pasdaks
-        };
+        const data = { cp: this.cp, stress: this.stress, cost: this.cost, pasdaks: this.pasdaks };
         localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
 
@@ -337,7 +278,7 @@ class Game {
                 this.stress = parsed.stress;
                 this.cost = parsed.cost;
                 this.pasdaks = parsed.pasdaks || [];
-                this.log("저장된 게임을 불러왔습니다.", "l-sys");
+                this.log("저장된 게임을 불러왔습니다.", "l-get");
             } catch (e) {
                 console.error("Save corrupted", e);
             }
@@ -345,39 +286,35 @@ class Game {
     }
 
     hardReset() {
-        if(confirm("정말 초기화 하시겠습니까?")) {
+        if(confirm("정말 모든 데이터를 삭제하고 초기화 하시겠습니까?")) {
             localStorage.removeItem(SAVE_KEY);
             location.reload();
         }
     }
 
-    /* --- Core Actions --- */
     pull() {
         if(this.cp < this.cost || this.pasdaks.length >= this.maxSlots) return;
 
         this.cp -= this.cost;
-        this.cost = Math.floor(this.cost * 1.15); 
+        this.cost = Math.floor(this.cost * 1.1); 
 
         const r = Math.random() * 100;
         let rank = 'N';
-        if (r < 4) rank = 'SSR';      
-        else if (r < 14) rank = 'F';  
-        else if (r < 30) rank = 'SR'; 
-        else if (r < 60) rank = 'R';  
+        if (r < 4) rank = 'SSR'; else if (r < 14) rank = 'F'; else if (r < 30) rank = 'SR'; else if (r < 60) rank = 'R';  
 
         const jobList = DB.jobs[rank];
         const job = jobList[Math.floor(Math.random() * jobList.length)];
         const name = (Math.random()<0.5?'유동':'고닉') + Math.floor(Math.random()*9999);
         
-        let power = 5; let chaos = 5;
-        if(rank === 'SSR') { power = 50; chaos = 0; }
-        else if(rank === 'SR') { power = 20; chaos = 5; }
-        else if(rank === 'F') { power = -15; chaos = 60; }
-        else if(rank === 'R') { power = 10; chaos = 10; }
+        let power = 5; let chaos = 5; let tName = "평범";
+        if(rank === 'SSR') { power = 50; chaos = 0; tName="금수저"; }
+        else if(rank === 'SR') { power = 20; chaos = 5; tName="엘리트"; }
+        else if(rank === 'F') { power = -15; chaos = 60; tName="트롤"; }
+        else if(rank === 'R') { power = 10; chaos = 10; tName="일꾼"; }
 
         const p = { 
             id: Math.random().toString(36).substr(2,9), 
-            rank, name, job, power, chaos
+            rank, name, job, power, chaos, tName
         };
 
         this.pasdaks.push(p);
@@ -392,7 +329,7 @@ class Game {
         const idx = this.pasdaks.findIndex(p => p.id === id);
         if(idx > -1) {
             const p = this.pasdaks[idx];
-            this.log(`${p.name}을(를) 해고했습니다.`, 'l-ban');
+            this.log(`${p.name} 해고됨.`, 'l-ban');
             this.createFloatText("해고", `card-${p.id}`, "#aaa");
             this.pasdaks.splice(idx, 1);
             this.cost = Math.max(100, Math.floor(this.cost * 0.95));
@@ -402,19 +339,15 @@ class Game {
         }
     }
 
-    /* --- Loop --- */
     tick() {
         if(this.isOver) return;
 
         let totalGain = 0;
-
         this.pasdaks.forEach(p => {
             const roll = Math.random() * 100;
-
             if (roll < p.chaos / 5) { 
                 this.triggerEvent(p);
-            } 
-            else {
+            } else {
                 totalGain += p.power;
                 if (Math.random() < 0.1) {
                     const el = document.getElementById(`st-${p.id}`);
@@ -423,24 +356,19 @@ class Game {
                         el.style.color = "#2ecc71";
                     }
                     if (p.power > 0) this.createFloatText(`+${p.power}`, `card-${p.id}`, "#2ecc71");
-                } 
-                else if (Math.random() < 0.05) {
+                } else if(Math.random() < 0.05) {
                     const el = document.getElementById(`st-${p.id}`);
-                    if(el) {
-                         el.innerText = DB.logs.idle[Math.floor(Math.random()*DB.logs.idle.length)];
-                         el.style.color = "#777";
-                    }
+                    if(el) { el.innerText = "대기 중..."; el.style.color = "#ccc"; }
                 }
             }
         });
 
         this.cp += totalGain;
         
-        // Stress
         const fCount = this.pasdaks.filter(p => p.rank === 'F').length;
         let stressInc = fCount * 0.5;
         if(totalGain < 0) stressInc += 0.5;
-        if(totalGain > 0 && this.pasdaks.length > 0) stressInc -= 0.2;
+        if(totalGain > 0 && this.pasdaks.length > 0) stressInc -= 0.3;
         
         this.stress = Math.min(100, Math.max(0, this.stress + stressInc));
 
@@ -450,8 +378,7 @@ class Game {
             document.getElementById('gameover').style.display = 'flex';
         }
 
-        // Ticker
-        if(Math.random() < 0.02) {
+        if(Math.random() < 0.01) {
             const msgs = ["야갤 침공 경보", "서버 불안정", "알바가 혐짤 삭제", "실베 등극", "유입 폭주 중"];
             this.ui.ticker.innerText = "속보: " + msgs[Math.floor(Math.random()*msgs.length)];
         }
@@ -461,49 +388,25 @@ class Game {
     }
 
     triggerEvent(p) {
-        const r = Math.random();
-        
-        if (p.rank === 'F' && r < 0.3) {
+        if (p.rank === 'F' && Math.random() < 0.3) {
             if(this.pasdaks.length > 1) {
                 const target = this.pasdaks[Math.floor(Math.random()*this.pasdaks.length)];
                 if(target.id !== p.id) {
-                    this.log(`🚨 [${p.name}]이(가) [${target.name}]을(를) 차단했습니다!`, 'l-ban');
-                    this.createFloatText("강제해고", `card-${target.id}`, "#ff4757");
+                    this.log(`🚨 [${p.name}]이 [${target.name}] 차단!`, 'l-ban');
                     this.kick(target.id);
-                    return;
                 }
             }
-        } 
-        else if (r < 0.3) { 
-            if(this.pasdaks.length > 1) {
-                const target = this.pasdaks[Math.floor(Math.random()*this.pasdaks.length)];
-                if(target.id !== p.id) {
-                    const fightMsg = DB.logs.fight[Math.floor(Math.random()*DB.logs.fight.length)];
-                    this.log(`[${p.name}] vs [${target.name}]: ${fightMsg}`, 'l-chat');
-                    const st = document.getElementById(`st-${p.id}`);
-                    if(st) { st.innerText = "🤬 키배 중"; st.style.color = "#ff4757"; }
-                    this.stress += 2;
-                }
-            }
-        }
-        else if (r > 0.9 && p.rank === 'F') { 
-            this.log(`💸 [${p.name}]이(가) 운영비를 횡령했습니다! (-50 CP)`, 'l-ban');
-            this.cp -= 50;
-            this.createFloatText("-50", `card-${p.id}`, "#ff4757");
-        }
-        else if (r > 0.95) { 
-            this.log(`💨 [${p.name}]이(가) 멘탈이 터져서 탈주했습니다.`, 'l-ban');
-            this.kick(p.id);
+        } else {
+            const st = document.getElementById(`st-${p.id}`);
+            if(st) { st.innerText = "🤬 키배 중"; st.style.color = "#e74c3c"; }
+            this.stress += 2;
         }
     }
 
     renderSlots() {
         this.ui.slots.innerHTML = '';
         if(this.pasdaks.length === 0) {
-            this.ui.slots.innerHTML = `<div style="grid-column: span 2; text-align:center; padding: 60px 20px; color:#444; font-family:'Jua';">
-                <div style="font-size:3rem; margin-bottom:10px;">👻</div>
-                고용된 파딱이 없습니다.<br>하단 버튼으로 노예를 소환하세요.
-            </div>`;
+            this.ui.slots.innerHTML = `<div style="grid-column: span 2; text-align:center; padding: 50px 20px; color:#555; font-family:'Jua';"><div style="font-size:3rem; margin-bottom:10px;">👻</div>고용된 파딱이 없습니다.</div>`;
             return;
         }
         this.pasdaks.forEach(p => {
@@ -513,10 +416,10 @@ class Game {
             d.innerHTML = `
                 <div class="c-top">
                     <span class="c-rank ${p.rank}">${p.rank}</span>
-                    <button class="btn-kick" onclick="game.kick('${p.id}')">해고</button>
+                    <button class="btn-fire" onclick="window.game.kick('${p.id}')">해고</button>
                 </div>
                 <div class="c-name">${p.name}</div>
-                <div class="c-info">${p.job}</div>
+                <div class="c-info">${p.job} | ${p.tName}</div>
                 <div class="c-status" id="st-${p.id}">대기</div>
             `;
             this.ui.slots.appendChild(d);
@@ -539,12 +442,12 @@ class Game {
     }
 
     showPop(p) {
-        const color = p.rank=='SSR'?'#f1c40f':(p.rank=='F'?'#c0392b':(p.rank=='SR'?'#9b59b6':(p.rank=='R'?'#3498db':'#95a5a6')));
+        const cols = {SSR:'#f1c40f', SR:'#9b59b6', R:'#3498db', N:'#95a5a6', F:'#c0392b'};
         this.ui.popRank.innerText = p.rank;
-        this.ui.popRank.style.color = color;
+        this.ui.popRank.style.color = cols[p.rank];
         this.ui.popName.innerText = p.name;
-        this.ui.popDesc.innerText = p.job;
-        this.ui.popCard.className = `pop-card ${p.rank}`;
+        this.ui.popDesc.innerText = `${p.job} | 특성: ${p.tName}`;
+        this.ui.popCard.style.borderColor = cols[p.rank];
         
         const ol = this.ui.overlay;
         ol.classList.remove('active'); void ol.offsetWidth; ol.classList.add('active');
@@ -565,7 +468,7 @@ class Game {
     }
 }
 
-const game = new Game();
+window.game = new Game();
 </script>
 </body>
 </html>
