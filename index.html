@@ -76,10 +76,30 @@
         .card.F { border: 2px solid var(--danger); background: #220505; }
         
         .c-top { display: flex; justify-content: space-between; align-items: center; }
-        .c-rank { font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; background: #444; }
-        .c-rank.SSR { background: var(--ssr); color: #000; box-shadow: 0 0 8px var(--ssr); }
-        .c-rank.F { background: var(--danger); }
+        /* ---------------- 수정 시작 ---------------- */
         
+        .c-rank { 
+            font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; 
+            color: #fff; font-weight: bold; 
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.5); /* 글자 잘 보이게 그림자 */
+        }
+
+        /* 각 등급별 배경색 지정 */
+        .c-rank.N { background: var(--n); color: #dcdcdc; }
+        .c-rank.R { background: var(--r); }
+        .c-rank.SR { background: var(--sr); }
+        
+        /* SSR은 특별하게 (검은 글씨 + 금색 배경 + 빛남) */
+        .c-rank.SSR { 
+            background: var(--ssr); color: #000; 
+            text-shadow: none; 
+            box-shadow: 0 0 10px var(--ssr); 
+        }
+        
+        /* F급은 위험한 색 */
+        .c-rank.F { background: var(--danger); }
+
+        /* ---------------- 수정 끝 ---------------- */        
         .c-name { font-weight: 900; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color:#ddd;}
         .c-info { font-size: 0.75rem; color: #888; }
         .c-status { font-size: 0.75rem; color: #aaa; margin-top: auto; font-weight: bold; min-height: 1.2em;}
