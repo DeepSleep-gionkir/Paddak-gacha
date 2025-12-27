@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>무한 파딱: CHIMERA & ALLIANCE</title>
+    <title>무한 파딱: ALLIANCE & CHIMERA</title>
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&family=Jua&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #050505; --panel: #121212;
-            --n: #95a5a6; --r: #3498db; --sr: #9b59b6; --ssr: #f1c40f; --ur: #00cec9; --f: #e74c3c;
-            --text: #ecf0f1; --border: #333;
-            --success: #2ecc71; --danger: #eb4d4b; --accent: #e67e22;
+            --bg: #0a0a0a; --panel: #141414;
+            --n: #95a5a6; --r: #3498db; --sr: #9b59b6; --ssr: #f1c40f; --ur: #00cec9; --f: #e74c3c; 
+            --hidden: #444;
+            --text: #f5f6fa; --border: #333;
+            --accent: #e67e22; --danger: #eb4d4b; --success: #6ab04c;
             --coop-bad: #d63031; /* 좆목질 색상 */
             --coop-good: #00cec9; /* 정의구현 색상 */
         }
@@ -22,188 +23,216 @@
             min-height: 100vh; overflow-y: auto; padding-bottom: 160px;
         }
         
-        h1, h2, .font-title, .font-pixel { font-family: 'Black Han Sans', sans-serif; }
-        
+        h1, .pop-rank, .c-rank, .font-title, .res-group, .slot-header { font-family: 'Black Han Sans', sans-serif; }
+        .font-pixel, .btn-gacha-text { font-family: 'Jua', sans-serif; }
+
         /* HEADER */
         header {
             position: sticky; top: 0; z-index: 100;
-            background: rgba(5, 5, 5, 0.95); border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center; padding: 8px 15px;
+            background: rgba(10, 10, 10, 0.95); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; padding: 12px 15px;
             backdrop-filter: blur(10px);
         }
-        .header-left { display: flex; flex-direction: column; }
-        .cp-display { font-size: 1.1rem; color: var(--ssr); text-shadow: 0 0 10px rgba(241, 196, 15, 0.3); letter-spacing: 1px; }
+        .cp-val { color: var(--ssr); font-size: 1.4rem; text-shadow: 0 0 10px rgba(241,196,15,0.5); letter-spacing: 1px; }
         
         .header-right { display: flex; align-items: center; gap: 10px; }
-        
-        /* STRESS BAR (New) */
         .stress-container { 
-            width: 100px; height: 16px; background: #222; border-radius: 4px; 
+            width: 110px; height: 18px; background: #222; border-radius: 4px; 
             overflow: hidden; position: relative; border: 1px solid #444;
         }
         .stress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #e67e22, #e74c3c); transition: width 0.2s; }
         .stress-label { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            font-size: 9px; color: #fff; text-shadow: 1px 1px 2px #000; letter-spacing: 1px; white-space: nowrap;
+            font-size: 10px; color: #fff; text-shadow: 1px 1px 2px #000; letter-spacing: 1px; white-space: nowrap;
         }
-
+        
         .reset-btn {
-            background: #2d3436; color: #888; border: 1px solid #444; 
-            padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; cursor: pointer;
+            background: #2d3436; color: #ccc; border: 1px solid #555; 
+            padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; 
+            cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
         }
 
-        /* TICKER (New) */
+        /* TICKER */
         .ticker-wrap {
             background: #000; border-bottom: 1px solid var(--border);
-            overflow: hidden; display: flex; align-items: center; height: 28px;
+            overflow: hidden; display: flex; align-items: center; height: 32px;
         }
         .ticker {
             white-space: nowrap; animation: ticker 25s linear infinite;
-            padding-left: 100%; color: var(--danger); font-size: 0.8rem; font-weight: bold;
+            padding-left: 100%; color: var(--danger); font-size: 0.9rem; font-family: 'Noto Sans KR'; font-weight: bold;
         }
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* FUSION ALTAR */
+        /* FUSION ALTAR (기존 디자인에 자연스럽게 녹이기) */
         .altar-area {
-            margin: 10px 15px; padding: 12px; background: linear-gradient(135deg, #181818, #000);
-            border: 1px solid var(--sr); border-radius: 12px;
-            display: flex; flex-direction: column; gap: 8px;
-            box-shadow: 0 0 15px rgba(155, 89, 182, 0.2);
+            margin: 15px 15px 0 15px; padding: 15px; background: linear-gradient(135deg, #181818, #0a0a0a);
+            border: 1px solid var(--border); border-radius: 12px;
+            display: flex; flex-direction: column; gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-        .altar-title { font-size: 0.9rem; color: var(--sr); display: flex; justify-content: space-between; align-items: center; }
-        .altar-slots { display: flex; gap: 10px; justify-content: center; height: 50px; }
+        .altar-title { 
+            font-size: 1rem; color: var(--sr); display: flex; justify-content: space-between; align-items: center; 
+            font-family: 'Jua', sans-serif; letter-spacing: 1px;
+        }
+        .altar-slots { display: flex; gap: 10px; justify-content: center; height: 60px; }
         .altar-slot { 
-            width: 50px; height: 50px; border: 2px dashed #444; border-radius: 8px; 
-            display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #444;
-            background: #111;
+            width: 60px; height: 60px; border: 2px dashed #444; border-radius: 8px; 
+            display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #555;
+            background: #111; transition: 0.2s;
         }
-        .altar-slot.filled { border-style: solid; color: #fff; font-weight: bold; background: #222; }
+        .altar-slot.filled { border-style: solid; color: #fff; font-weight: bold; background: #222; border-color: var(--success); }
         
         .btn-fuse {
-            background: var(--sr); color: #fff; border: none; padding: 8px; border-radius: 8px;
-            font-size: 0.9rem; font-weight: bold; cursor: pointer; width: 100%;
-            box-shadow: 0 4px 0 #8e44ad; transition: 0.1s;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad); color: #fff; border: 1px solid #8e44ad;
+            padding: 10px; border-radius: 8px; font-size: 1rem; font-family: 'Jua', sans-serif;
+            cursor: pointer; width: 100%; box-shadow: 0 4px 0 #6c3483; transition: 0.1s;
         }
         .btn-fuse:active { transform: translateY(4px); box-shadow: none; }
-        .btn-fuse:disabled { filter: grayscale(1); opacity: 0.3; pointer-events: none; transform: translateY(2px); box-shadow:none;}
+        .btn-fuse:disabled { filter: grayscale(1); opacity: 0.3; pointer-events: none; transform: translateY(2px); box-shadow: none; }
 
-        /* CARD GRID */
-        main { padding: 0 15px; display: flex; flex-direction: column; gap: 15px; }
+
+        /* MAIN */
+        main { padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+
+        .slot-header { 
+            display: flex; justify-content: space-between; margin-bottom: 8px; 
+            font-size: 1rem; color: #7f8fa6; letter-spacing: 1px;
+        }
         .slot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         
+        /* CARD STYLE */
         .card {
-            background: var(--panel); border: 1px solid #333; border-radius: 8px; padding: 8px;
+            background: var(--panel); border: 1px solid #333; border-radius: 8px; padding: 10px;
             position: relative; display: flex; flex-direction: column; gap: 4px; min-height: 110px;
-            transition: 0.2s; cursor: pointer; overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; cursor: pointer;
         }
-        .card.selected { border: 2px solid var(--success); background: #0f2215; transform: scale(0.98); }
-        
-        /* Rank Styles */
-        .card.UR { border: 2px solid var(--ur); background: radial-gradient(circle at top right, #004444, #000); box-shadow: 0 0 10px var(--ur); animation: glow 2s infinite alternate;}
+        .card.selected { border: 2px solid var(--success) !important; background: #0f2215 !important; transform: scale(0.97); }
+
+        .card.Hidden { border: 2px dashed #555; background: #181818; }
+        .card.N { border-color: var(--n); }
+        .card.R { border-color: var(--r); }
+        .card.SR { border-color: var(--sr); }
         .card.SSR { border: 2px solid var(--ssr); background: radial-gradient(circle at top right, #3a2a05, #111); }
+        .card.UR { border: 2px solid var(--ur); background: radial-gradient(circle at top right, #004444, #000); box-shadow: 0 0 15px var(--ur); animation: glow 2s infinite alternate;}
         .card.F { border: 2px solid var(--f); background: #220505; }
         
-        .c-header { display: flex; justify-content: space-between; align-items: center; }
-        .c-rank { font-size: 0.75rem; padding: 2px 5px; border-radius: 3px; color: #000; font-weight: bold; }
-        .c-rank.UR { background: var(--ur); color: #000; box-shadow: 0 0 8px var(--ur); }
-        .c-rank.SSR { background: var(--ssr); } 
-        .c-rank.SR { background: var(--sr); color:#fff;}
-        .c-rank.R { background: var(--r); color:#fff;} 
-        .c-rank.N { background: var(--n); } 
-        .c-rank.F { background: var(--f); color:#fff;}
+        @keyframes glow { from { box-shadow: 0 0 5px var(--ur); } to { box-shadow: 0 0 20px var(--ur); } }
+
+        .c-top { display: flex; justify-content: space-between; align-items: center; }
         
-        .c-lv { font-size: 0.7rem; color: #aaa; }
-        .c-name { font-size: 0.95rem; font-weight: bold; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #ddd;}
-        .c-job { font-size: 0.7rem; color: #777; }
-        .c-status { font-size: 0.7rem; color: #aaa; margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end;}
-
-        /* Fire Button (New) */
-        .btn-fire {
-            background: #333; color: #bbb; border: 1px solid #555; font-size: 0.6rem;
-            padding: 2px 6px; border-radius: 4px; cursor: pointer; z-index: 10;
+        .c-rank { 
+            font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; color: #fff; 
+            font-weight: bold; text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
         }
-        .btn-fire:hover { background: var(--f); color: white; border-color: var(--f); }
-
-        @keyframes glow { from { box-shadow: 0 0 5px var(--ur); } to { box-shadow: 0 0 15px var(--ur); } }
+        .c-rank.Hidden { background: var(--hidden); color: #aaa; }
+        .c-rank.N { background: var(--n); color: #2d3436; }
+        .c-rank.R { background: var(--r); }
+        .c-rank.SR { background: var(--sr); }
+        .c-rank.SSR { background: var(--ssr); color: #000; box-shadow: 0 0 8px var(--ssr); text-shadow: none; }
+        .c-rank.UR { background: var(--ur); color: #000; box-shadow: 0 0 10px var(--ur); text-shadow: none; }
+        .c-rank.F { background: var(--f); }
+        
+        .c-name { font-weight: 900; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color:#ddd;}
+        .c-info { font-size: 0.75rem; color: #888; }
+        /* c-status를 원래 스타일대로 복구 */
+        .c-status { 
+            font-size: 0.75rem; color: #aaa; margin-top: auto; font-weight: bold; min-height: 1.2em;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        
+        .btn-fire { 
+            background: #222; color: #ccc; border: 1px solid #444; 
+            border-radius: 4px; padding: 3px 8px; font-size: 0.7rem; cursor: pointer;
+            z-index: 10;
+        }
+        .btn-fire:hover { background: var(--f); color: #fff; border-color: var(--f); }
 
         /* LOGS */
         #section-logs {
-            background: #000; padding: 10px; border: 1px solid #333; border-radius: 8px;
-            font-family: 'Noto Sans KR', monospace; font-size: 0.8rem; line-height: 1.5;
-            height: 180px; overflow-y: auto;
+            background: #000; padding: 12px; border: 1px solid #333; border-radius: 8px;
+            font-family: 'Noto Sans KR', sans-serif; font-size: 0.9rem; line-height: 1.6;
+            height: 200px; overflow-y: auto; box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
         }
-        .log { margin-bottom: 3px; border-bottom: 1px dashed #222; padding-bottom: 2px; }
-        .l-sys { color: #555; } 
+        .log { margin-bottom: 4px; border-bottom: 1px dashed #222; padding-bottom: 2px; text-shadow: 1px 1px 0 #000; }
+        .l-sys { color: #555; font-size: 0.8rem; }
+        .l-get { color: var(--ssr); font-weight: bold; } 
         .l-ur { color: var(--ur); font-weight: bold; }
-        .l-ssr { color: var(--ssr); } 
-        .l-fail { color: var(--f); } 
-        .l-up { color: var(--success); }
-        .l-coop-bad { color: var(--coop-bad); font-weight: bold; border-left: 2px solid var(--coop-bad); padding-left: 4px;}
-        .l-coop-good { color: var(--coop-good); font-weight: bold; border-left: 2px solid var(--coop-good); padding-left: 4px;}
+        .l-ban { color: var(--f); font-weight: bold; } 
+        .l-work { color: var(--success); }
+        .l-chaos { color: var(--accent); font-weight: bold; }
+        .l-coop-bad { color: #d63031; font-weight: 900; border-left: 3px solid #d63031; padding-left: 5px; }
+        .l-coop-good { color: #00cec9; font-weight: 900; border-left: 3px solid #00cec9; padding-left: 5px; }
 
-        /* FOOTER */
+        /* FOOTER (2버튼으로 변경하되 디자인은 1번 코드 계승) */
         footer {
             position: fixed; bottom: 0; left: 0; width: 100%;
             display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;
             padding: 15px; background: rgba(10,10,10,0.95); border-top: 1px solid #333; z-index: 90;
         }
         .btn-gacha {
-            height: 60px; border: none; border-radius: 10px; color: #fff; cursor: pointer;
+            height: 65px; border: none; border-radius: 12px; color: #fff; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.5); transition: 0.1s;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.5); transition: 0.1s; text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .btn-gacha:active { transform: translateY(4px); box-shadow: none; }
-        .btn-gacha:disabled { filter: grayscale(1); opacity: 0.5; }
+        .btn-gacha:active { transform: translateY(6px); box-shadow: none; }
+        .btn-gacha:disabled { filter: grayscale(1); opacity: 0.5; transform: translateY(6px); box-shadow: none; }
         
-        #btn-norm { background: #34495e; border: 1px solid #555; }
-        #btn-prem { background: linear-gradient(135deg, #00cec9, #0984e3); border: 1px solid #00cec9; }
+        #btn-norm { background: linear-gradient(135deg, #34495e, #2c3e50); box-shadow: 0 6px 0 #1e272e; }
+        #btn-prem { background: linear-gradient(135deg, #e67e22, #d35400); box-shadow: 0 6px 0 #a34000; } /* 기존 버튼 색 계승 */
 
-        /* OVERLAYS & EFFECTS */
+        .btn-gacha-text { font-size: 1.2rem; }
+        .cost-label { font-size: 0.8rem; font-weight: bold; opacity: 0.9; font-family: 'Noto Sans KR'; }
+
+        /* POPUP */
         .overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000;
-            display: none; justify-content: center; align-items: center; flex-direction: column;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000;
+            display: none; justify-content: center; align-items: center; flex-direction: column; pointer-events: none;
         }
         .overlay.active { display: flex; animation: fadeIn 0.1s forwards; }
         .pop-card {
-            background: #222; border-radius: 20px; padding: 30px; text-align: center; border: 4px solid #fff;
-            min-width: 280px; box-shadow: 0 0 50px rgba(255,255,255,0.2); animation: popIn 0.3s forwards;
+            background: #222; border-radius: 20px; padding: 40px; text-align: center; 
+            transform: scale(0.5); opacity: 0; animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            box-shadow: 0 0 80px rgba(255, 165, 2, 0.3); pointer-events: auto; min-width: 300px;
+            border: 4px solid #fff;
         }
-        .pop-rank { font-size: 4rem; font-family: 'Black Han Sans'; margin-bottom: 5px; }
+        .pop-rank { font-size: 4rem; margin-bottom: 10px; color: #fff; text-shadow: 4px 4px 0 #000; }
+        .pop-name { font-size: 1.8rem; color: #fff; margin-bottom: 10px; }
+        .pop-desc { font-size: 1rem; color: #aaa; }
         
         .float-txt {
-            position: absolute; font-weight: 900; pointer-events: none; z-index: 50;
-            text-shadow: 1px 1px 2px #000; animation: floatUp 1s forwards; font-size: 1rem;
+            position: absolute; font-weight: 900; pointer-events: none; z-index: 100;
+            text-shadow: 1px 1px 2px #000; animation: floatUp 1s forwards; font-size: 1.1rem;
         }
+        #gameover { pointer-events: auto; }
 
-        #gameover { z-index: 2000; }
-
-        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes popIn { to { transform: scale(1); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-50px); } }
     </style>
 </head>
 <body>
 
     <header>
         <div class="header-left">
-            <div class="font-title cp-display">💎 <span id="ui-cp">0</span> CP</div>
+            <span class="cp-val font-title">💎 <span id="ui-cp">0</span></span>
         </div>
         <div class="header-right">
             <div class="stress-container">
                 <div id="ui-stress" class="stress-bar"></div>
                 <div class="stress-label">MENTAL</div>
             </div>
-            <button class="reset-btn" onclick="game.hardReset()">초기화</button>
+            <button class="reset-btn" onclick="window.game.hardReset()">초기화</button>
         </div>
     </header>
 
     <div class="ticker-wrap">
-        <div class="ticker" id="ui-ticker">📢 시스템: 융합 기능과 협동 업데이트가 적용되었습니다.</div>
+        <div class="ticker" id="ui-ticker">📢 시스템: 영혼 융합 및 협동(Alliance) 업데이트 완료. 좆목질과 키메라를 주의하세요...</div>
     </div>
 
     <div class="altar-area">
-        <div class="altar-title font-pixel">
-            <span>🔮 영혼 융합 (고닉 세탁기)</span>
+        <div class="altar-title">
+            <span>🔮 영혼 융합 (세탁기)</span>
             <span style="font-size:0.7rem; color:#888;">2명 선택하여 합체</span>
         </div>
         <div class="altar-slots">
@@ -211,83 +240,91 @@
             <div style="display:flex; align-items:center; color:#555;">+</div>
             <div id="slot-2" class="altar-slot">선택2</div>
         </div>
-        <button id="btn-fuse" class="btn-fuse font-pixel" onclick="game.fuse()" disabled>
-            융합 시작 (비용: 300 CP)
+        <button id="btn-fuse" class="btn-fuse" onclick="game.fuse()" disabled>
+            융합 시작 (300 CP)
         </button>
     </div>
 
     <main>
-        <div style="display:flex; justify-content:space-between; color:#888; font-size:0.8rem; margin-bottom:5px;">
-            <span>보유 파딱 (<span id="ui-count">0</span>/12)</span>
-            <span>카드를 눌러 선택 / 우측하단 해고</span>
-        </div>
-        <div id="slot-grid" class="slot-grid"></div>
-        
-        <div style="margin-top:10px;">
-            <div style="color:#666; font-size:0.8rem; margin-bottom:5px;">시스템 로그</div>
-            <div id="section-logs"></div>
-        </div>
+        <section id="section-slots">
+            <div class="slot-header">
+                <span>⚔️ 완장 라인업 (<span id="ui-count">0</span>/12)</span>
+                <span style="font-size:0.8rem; color:#666;">카드를 눌러 선택</span>
+            </div>
+            <div id="slot-grid" class="slot-grid"></div>
+        </section>
+
+        <section>
+            <div style="color:#555; font-size:0.8rem; margin-bottom:5px; font-weight:bold; letter-spacing:1px;">🚨 실시간 상황실</div>
+            <div id="section-logs">
+                <div class="log l-sys">서버 연결 성공. 로그 기록을 시작합니다.</div>
+            </div>
+        </section>
     </main>
 
     <footer>
         <button id="btn-norm" class="btn-gacha" onclick="game.pull('normal')">
-            <span class="font-pixel" style="font-size:1.1rem;">일반 뽑기</span>
-            <span style="font-size:0.8rem; opacity:0.8;" id="cost-norm">100 CP</span>
+            <span class="btn-gacha-text">일반</span>
+            <span id="cost-norm" class="cost-label">100 CP</span>
         </button>
         <button id="btn-prem" class="btn-gacha" onclick="game.pull('premium')">
-            <span class="font-pixel" style="font-size:1.1rem;">✨ 고급 인력소</span>
-            <span style="font-size:0.8rem; opacity:0.8;" id="cost-prem">1000 CP</span>
+            <span class="btn-gacha-text">🔥 고급 인력</span>
+            <span id="cost-prem" class="cost-label">1000 CP</span>
         </button>
     </footer>
 
     <div id="overlay" class="overlay">
         <div id="pop-card" class="pop-card">
-            <div id="pop-rank" class="pop-rank">SSR</div>
-            <div id="pop-name" style="font-size:1.5rem; color:#fff; margin-bottom:5px;">이름</div>
-            <div id="pop-desc" style="color:#aaa; font-size:0.9rem;">내용</div>
+            <div id="pop-rank" class="pop-rank">???</div>
+            <div id="pop-name" class="pop-name">수습 파딱</div>
+            <div id="pop-desc" class="pop-desc">잠시 후 정체가 공개됩니다.</div>
         </div>
     </div>
 
     <div id="gameover" class="overlay">
-        <h1 style="color:var(--f); font-size:3rem; margin-bottom:20px; font-family:'Black Han Sans';">GAME OVER</h1>
-        <p style="color:#ccc; margin-bottom:30px; text-align:center;">
-            멘탈이 터졌습니다.<br>갤러리가 친목질로 망했습니다.
-        </p>
-        <button onclick="game.hardReset()" style="padding:15px 40px; border-radius:30px; border:none; background:var(--f); color:#fff; font-weight:bold; cursor:pointer;">새 지구 파기</button>
+        <h1 style="color:var(--f); font-size:4rem; margin-bottom:20px;">GAME OVER</h1>
+        <p style="color:#ccc; margin-bottom:40px; font-size:1.2rem;">멘탈이 터졌습니다.<br>갤러리가 친목질로 망했습니다.</p>
+        <button onclick="window.game.hardReset()" style="padding:15px 50px; border-radius:30px; border:none; background:var(--f); color:#fff; font-weight:bold; font-size:1.3rem; cursor:pointer;">새 지구 파기</button>
     </div>
 
 <script>
+// DB 복구: 원래의 찰진 멘트들
 const DB = {
     jobs: {
-        N: ['유동', '눈팅', '질문충', '핑프', '복붙러'],
-        R: ['정보게이', '짤쟁이', '번역가', '리뷰어'],
-        SR: ['24시간상주', '코드슬레이어', '부검전문가', '키배왕'],
-        SSR: ['서버관리자', '빛의완장', 'AI알바', '디시현자'],
-        UR: ['갤러리주인', '초월자', '운영자', '김유식'],
-        F: ['분탕', '좆목질', '네임드호소인', '여왕벌', '도배기']
+        N: ['눈팅족', '개추봇', '댓글러', '유동', '질문충', '핑프', '복붙러'],
+        R: ['짤쟁이', '번역핫산', '정보게이', '뉴스봇', '리뷰어', '분석가'],
+        SR: ['24시간상주', '코드슬레이어', '새벽반', '부검전문가', '키배워리어'],
+        SSR: ['김유식조카', '서버관리자', '빛의완장', 'AI알바', '디시의현자'],
+        UR: ['초월자', '갤러리주인', '황금고닉', '운영자'],
+        F: ['분탕충', '타갤첩자', '좆목대장', '권력남용', '컨셉충', '네임드호소인']
     },
-    ranks: ['N', 'R', 'SR', 'SSR', 'UR', 'F'],
-    power: { N:2, R:5, SR:15, SSR:40, UR:100, F:-10 }
+    logs: {
+        work: [ "야짤 컷", "VPN 차단", "할카스 제거", "주작기 차단", "실베 방어", "매크로 차단", "광고글 삭제", "유입 질문 답변" ],
+        fight: [ "패드립 시전", "현피 신청", "고닉 고로시", "뒷담화 적발", "통매음 고소", "완장질" ],
+        idle: [ "자는 중", "라면 먹음", "눈팅 중", "똥 싸는 중", "롤 하는 중", "유튜브 시청" ],
+        chaos: [ "타갤 침공!", "주작기 가동!", "야짤 달리는 중", "유입 폭주", "횡령 적발", "좆목질 포착" ]
+    },
+    power: { N:2, R:6, SR:15, SSR:40, UR:100, F:-15 } // 융합 계산용
 };
 
-const SAVE_KEY = "pasdak_v24_full_merge";
+const SAVE_KEY = "pasdak_v30_final_fix";
 
 class Game {
     constructor() {
-        this.cp = 1000;
-        this.stress = 0; // New: 멘탈 수치
+        this.cp = 500;
+        this.stress = 0;
+        this.pasdaks = [];
+        this.maxSlots = 12; // 융합이 생겼으니 슬롯 약간 줄임
         this.isOver = false;
         
-        this.pasdaks = [];
-        this.maxSlots = 12;
-        this.selected = []; // 융합용
+        this.selected = []; // 융합 선택용
         this.costNorm = 100;
         this.costPrem = 1000;
-        
+
         this.ui = {
             cp: document.getElementById('ui-cp'),
             stress: document.getElementById('ui-stress'),
-            ticker: document.getElementById('ui-ticker'),
+            count: document.getElementById('ui-count'),
             grid: document.getElementById('slot-grid'),
             logs: document.getElementById('section-logs'),
             overlay: document.getElementById('overlay'),
@@ -295,6 +332,7 @@ class Game {
             popRank: document.getElementById('pop-rank'),
             popName: document.getElementById('pop-name'),
             popDesc: document.getElementById('pop-desc'),
+            ticker: document.getElementById('ui-ticker'),
             slot1: document.getElementById('slot-1'),
             slot2: document.getElementById('slot-2'),
             btnFuse: document.getElementById('btn-fuse'),
@@ -303,340 +341,10 @@ class Game {
         };
 
         if(localStorage.getItem(SAVE_KEY)) this.loadGame();
-        this.render();
-        setInterval(() => this.tick(), 1000);
-    }
-
-    /* --- GACHA --- */
-    pull(type) {
-        if(this.isOver) return;
-        let cost = type === 'premium' ? this.costPrem : this.costNorm;
-        if(this.cp < cost || this.pasdaks.length >= this.maxSlots) {
-            if(this.pasdaks.length >= this.maxSlots) alert("슬롯이 가득 찼습니다! 융합하거나 해고하세요.");
-            return;
-        }
-
-        this.cp -= cost;
-        if(type==='premium') this.costPrem = Math.floor(this.costPrem * 1.1);
-        else this.costNorm = Math.floor(this.costNorm * 1.1);
-
-        const r = Math.random() * 100;
-        let rank = 'N';
-
-        if(type === 'premium') {
-            if(r < 5) rank = 'UR';
-            else if(r < 25) rank = 'SSR';
-            else if(r < 65) rank = 'SR';
-            else if(r < 95) rank = 'R';
-            else rank = 'F'; 
-        } else {
-            if(r < 2) rank = 'SSR';
-            else if(r < 32) rank = 'F';
-            else if(r < 42) rank = 'SR';
-            else if(r < 62) rank = 'R';
-            else rank = 'N';
-        }
-
-        this.addPasdak(rank, type === 'premium');
-        this.saveGame();
-    }
-
-    addPasdak(rank, isPrem) {
-        const jobList = DB.jobs[rank];
-        const job = jobList[Math.floor(Math.random() * jobList.length)];
-        const name = (Math.random()<0.5?'유동':'고닉') + Math.floor(Math.random()*999);
+        this.renderSlots();
+        this.updateUI();
         
-        const p = {
-            id: Math.random().toString(36).substr(2, 9),
-            rank, name, job,
-            lv: 1, exp: 0,
-            power: DB.power[rank],
-            revealed: false,
-            revealTimer: isPrem ? 3 : 8
-        };
-        
-        this.pasdaks.push(p);
-        this.showPop(p, true);
-        this.render();
-    }
-
-    /* --- ACTIONS (Fusion, Fire) --- */
-    toggleSelect(id) {
-        if(this.isOver) return;
-        const idx = this.selected.indexOf(id);
-        if(idx > -1) this.selected.splice(idx, 1);
-        else {
-            if(this.selected.length >= 2) this.selected.shift();
-            this.selected.push(id);
-        }
-        this.render();
-        this.updateAltar();
-    }
-
-    fire(e, id) {
-        e.stopPropagation(); // 카드 선택 방지
-        if(!confirm("정말 해고하시겠습니까? (비용 반환 없음)")) return;
-        
-        this.pasdaks = this.pasdaks.filter(p => p.id !== id);
-        this.selected = this.selected.filter(sid => sid !== id);
-        this.log(`🚫 [해고] 인원 감축 완료.`, 'l-sys');
-        
-        // 해고 시 약간의 스트레스 감소
-        this.stress = Math.max(0, this.stress - 2);
-        
-        this.render();
-        this.updateAltar();
-        this.saveGame();
-    }
-
-    updateAltar() {
-        const p1 = this.pasdaks.find(p => p.id === this.selected[0]);
-        const p2 = this.pasdaks.find(p => p.id === this.selected[1]);
-
-        this.ui.slot1.className = p1 ? `altar-slot filled` : `altar-slot`;
-        this.ui.slot1.innerText = p1 ? `[${p1.revealed?p1.rank:'?'}]` : "선택1";
-        this.ui.slot1.style.borderColor = p1 && p1.revealed ? this.getRankColor(p1.rank) : '#444';
-
-        this.ui.slot2.className = p2 ? `altar-slot filled` : `altar-slot`;
-        this.ui.slot2.innerText = p2 ? `[${p2.revealed?p2.rank:'?'}]` : "선택2";
-        this.ui.slot2.style.borderColor = p2 && p2.revealed ? this.getRankColor(p2.rank) : '#444';
-
-        this.ui.btnFuse.disabled = this.selected.length !== 2 || this.cp < 300;
-    }
-
-    fuse() {
-        if(this.selected.length !== 2 || this.cp < 300) return;
-        this.cp -= 300;
-
-        const p1 = this.pasdaks.find(p => p.id === this.selected[0]);
-        const p2 = this.pasdaks.find(p => p.id === this.selected[1]);
-        
-        this.pasdaks = this.pasdaks.filter(p => !this.selected.includes(p.id));
-        this.selected = [];
-
-        // Logic
-        const scoreMap = {N:1, R:2, SR:3, SSR:4, UR:5, F:0};
-        const s1 = scoreMap[p1.revealed ? p1.rank : 'N']; 
-        const s2 = scoreMap[p2.revealed ? p2.rank : 'N'];
-        const avg = (s1 + s2) / 2;
-        
-        const r = Math.random();
-        let newRank = 'N';
-        
-        if (r < 0.15) newRank = 'F'; // 융합 실패
-        else if (r < 0.25 && avg >= 4) newRank = 'UR';
-        else if (avg >= 3.5) newRank = 'SSR';
-        else if (avg >= 2.5) newRank = 'SR';
-        else if (avg >= 1.5) newRank = 'R';
-        else newRank = 'N';
-
-        const jobList = DB.jobs[newRank];
-        const newP = {
-            id: Math.random().toString(36).substr(2,9),
-            rank: newRank,
-            name: "키메라" + Math.floor(Math.random()*99),
-            job: jobList[Math.floor(Math.random()*jobList.length)],
-            lv: 1, exp: 0,
-            power: DB.power[newRank],
-            revealed: true,
-            revealTimer: 0
-        };
-        this.pasdaks.push(newP);
-        
-        const logType = newRank === 'UR' ? 'l-ur' : (newRank === 'F' ? 'l-fail' : 'l-sys');
-        this.log(`🧬 [융합] ${p1.name} + ${p2.name} → [${newRank}] ${newP.name}`, logType);
-        
-        if(newRank === 'UR') this.showPop(newP, false);
-        
-        this.render();
-        this.updateAltar();
-        this.saveGame();
-    }
-
-    /* --- GAME LOOP --- */
-    tick() {
-        if(this.isOver) return;
-
-        let gain = 0;
-        let stressDelta = 0;
-
-        // F급 갯수 파악
-        const fCount = this.pasdaks.filter(p => p.revealed && p.rank === 'F').length;
-        stressDelta += fCount * 0.5; // F급은 숨쉬기만 해도 스트레스 유발
-
-        this.pasdaks.forEach(p => {
-            // 1. Reveal
-            if (!p.revealed) {
-                p.revealTimer--;
-                if (p.revealTimer <= 0) {
-                    p.revealed = true;
-                    this.log(`🔍 [정체] ${p.name} = [${p.rank}] 확정!`, p.rank=='F'?'l-fail':'l-sys');
-                    this.createFloatText(p.rank, `card-${p.id}`, this.getRankColor(p.rank));
-                }
-            }
-
-            // 2. Production & Exp
-            let production = p.power + (p.lv * (p.rank=='UR'?5:1));
-            if(p.rank === 'F') production = -10; // F급은 손해
-            
-            gain += production;
-            
-            p.exp++;
-            if (p.exp >= p.lv * 20) { 
-                p.lv++; p.exp = 0;
-                if(Math.random() < 0.2) this.createFloatText("Level Up!", `card-${p.id}`, "#2ecc71");
-            }
-
-            // 3. Cooperation Events (New Feature)
-            if(p.revealed && Math.random() < 0.03) { // 3% Chance
-                this.handleEvent(p);
-            }
-        });
-
-        // 4. Update Stats
-        if(gain !== 0) this.cp += gain;
-        
-        // 적자가 나면 스트레스 증가, 흑자면 약간 감소
-        if(gain < 0) stressDelta += 1;
-        else if(gain > 100) stressDelta -= 0.2;
-
-        this.stress = Math.min(100, Math.max(0, this.stress + stressDelta));
-
-        if(this.stress >= 100) {
-            this.isOver = true;
-            document.getElementById('gameover').style.display = 'flex';
-        }
-
-        // Ticker Update
-        this.updateTicker();
-        
-        this.render();
-        this.saveGame();
-    }
-
-    handleEvent(p) {
-        // F급 좆목질
-        if(p.rank === 'F') {
-            const partners = this.pasdaks.filter(t => t.id !== p.id && t.rank === 'F' && t.revealed);
-            if(partners.length > 0) {
-                const partner = partners[Math.floor(Math.random()*partners.length)];
-                this.log(`🤮 [좆목] ${p.name} & ${partner.name}: 여론 조작 시도!`, 'l-coop-bad');
-                this.createFloatText("좆목", `card-${p.id}`, "#d63031");
-                this.stress += 5;
-            }
-        }
-        // 고위직(SR, SSR, UR) 정의구현
-        else if(['SR','SSR','UR'].includes(p.rank)) {
-            const targets = this.pasdaks.filter(t => t.rank === 'F');
-            if(targets.length > 0 && Math.random() < 0.5) {
-                const target = targets[0]; // F급 적발
-                // 자동 해고 기능 (20% 확률)
-                if(Math.random() < 0.2) {
-                    this.log(`⚖️ [숙청] ${p.name}: 분탕 ${target.name} 검거 및 차단!`, 'l-coop-good');
-                    this.pasdaks = this.pasdaks.filter(x => x.id !== target.id);
-                    this.stress = Math.max(0, this.stress - 10);
-                } else {
-                    this.log(`🛡️ [방어] ${p.name}: 분탕글 삭제 처리.`, 'l-coop-good');
-                    this.stress = Math.max(0, this.stress - 2);
-                }
-                this.createFloatText("일한다", `card-${p.id}`, "#00cec9");
-            }
-        }
-    }
-
-    updateTicker() {
-        if(this.stress > 80) {
-            this.ui.ticker.innerText = "🚨 경고: 갤러리 폭파 5분 전! 멘탈이 위태롭습니다!";
-            this.ui.ticker.style.color = "red";
-        } else if(Math.random() < 0.01) {
-            const msgs = ["실베 등극!", "유입 폭주 중...", "서버가 불안정합니다.", "새벽반 점호 시작", "야짤 낚시 주의"];
-            this.ui.ticker.innerText = "📢 속보: " + msgs[Math.floor(Math.random()*msgs.length)];
-            this.ui.ticker.style.color = "#e67e22";
-        }
-    }
-
-    /* --- RENDER & UI --- */
-    render() {
-        this.ui.cp.innerText = Math.floor(this.cp);
-        this.ui.stress.style.width = this.stress + "%";
-        document.getElementById('ui-count').innerText = this.pasdaks.length;
-        
-        document.getElementById('cost-norm').innerText = this.costNorm + " CP";
-        document.getElementById('cost-prem').innerText = this.costPrem + " CP";
-        this.ui.btnNorm.disabled = this.cp < this.costNorm || this.pasdaks.length >= this.maxSlots;
-        this.ui.btnPrem.disabled = this.cp < this.costPrem || this.pasdaks.length >= this.maxSlots;
-        
-        // Grid
-        this.ui.grid.innerHTML = '';
-        this.pasdaks.forEach(p => {
-            const el = document.createElement('div');
-            const isSel = this.selected.includes(p.id);
-            const rClass = p.revealed ? p.rank : 'Hidden';
-            
-            el.className = `card ${rClass} ${isSel ? 'selected' : ''}`;
-            el.id = `card-${p.id}`;
-            el.onclick = () => this.toggleSelect(p.id);
-            
-            el.innerHTML = `
-                <div class="c-header">
-                    <span class="c-rank ${rClass}">${p.revealed ? p.rank : '???'}</span>
-                    <button class="btn-fire" onclick="game.fire(event, '${p.id}')">해고</button>
-                </div>
-                <div class="c-name">${p.name}</div>
-                <div class="c-job">${p.revealed ? p.job : '심사 중...'}</div>
-                <div class="c-status">
-                    <span>Lv.${p.lv}</span>
-                    <span>${p.revealed ? (p.power+(p.lv*2))+' P' : '?'}</span>
-                </div>
-            `;
-            this.ui.grid.appendChild(el);
-        });
-    }
-
-    log(msg, cls) {
-        const d = document.createElement('div');
-        d.className = `log ${cls||''}`; d.innerText = msg;
-        this.ui.logs.appendChild(d);
-        this.ui.logs.scrollTop = this.ui.logs.scrollHeight;
-    }
-
-    createFloatText(txt, cardId, color) {
-        const card = document.getElementById(cardId);
-        if(!card) return;
-        const el = document.createElement('div');
-        el.className = 'float-txt';
-        el.innerText = txt;
-        el.style.color = color;
-        el.style.left = '30%'; el.style.top = '40%';
-        card.appendChild(el);
-        setTimeout(() => el.remove(), 900);
-    }
-
-    showPop(p, hidden=false) {
-        const colors = this.getRankColor(p.rank);
-        
-        if (hidden) {
-            this.ui.popRank.innerText = "???";
-            this.ui.popRank.style.color = "#fff";
-            this.ui.popName.innerText = p.name;
-            this.ui.popDesc.innerText = "수습 완장 (정체 불명)";
-            this.ui.popCard.style.borderColor = "#fff";
-        } else {
-            this.ui.popRank.innerText = p.rank;
-            this.ui.popRank.style.color = colors;
-            this.ui.popName.innerText = p.name;
-            this.ui.popDesc.innerText = `[${p.job}] 탄생!`;
-            this.ui.popCard.style.borderColor = colors;
-        }
-        
-        const ol = this.ui.overlay;
-        ol.classList.remove('active'); void ol.offsetWidth; ol.classList.add('active');
-        setTimeout(()=>ol.classList.remove('active'), 1000);
-    }
-
-    getRankColor(r) {
-        const map = {UR:'#00cec9', SSR:'#f1c40f', SR:'#9b59b6', R:'#3498db', N:'#7f8c8d', F:'#e74c3c'};
-        return map[r] || '#fff';
+        setInterval(() => this.tick(), 1000); 
     }
 
     saveGame() {
@@ -649,15 +357,431 @@ class Game {
         try {
             const d = JSON.parse(localStorage.getItem(SAVE_KEY));
             if(d) {
-                this.cp = d.cp; this.stress = d.stress || 0; 
-                this.pasdaks = d.pasdaks;
-                this.costNorm = d.costNorm; this.costPrem = d.costPrem;
+                this.cp = d.cp; this.stress = d.stress;
+                this.pasdaks = d.pasdaks || [];
+                this.costNorm = d.costNorm || 100;
+                this.costPrem = d.costPrem || 1000;
             }
-        } catch(e) { console.log("Save error"); }
+        } catch (e) {}
     }
 
     hardReset() {
-        if(confirm("초기화 하시겠습니까?")) { localStorage.removeItem(SAVE_KEY); location.reload(); }
+        if(confirm("정말 초기화 하시겠습니까?")) {
+            this.isOver = true; 
+            localStorage.removeItem(SAVE_KEY);
+            location.reload();
+        }
+    }
+
+    pull(type) {
+        if(this.isOver) return;
+        let cost = type === 'premium' ? this.costPrem : this.costNorm;
+
+        if(this.cp < cost || this.pasdaks.length >= this.maxSlots) return;
+
+        this.cp -= cost;
+        if(type==='premium') this.costPrem = Math.floor(this.costPrem * 1.1);
+        else this.costNorm = Math.floor(this.costNorm * 1.1);
+
+        const r = Math.random() * 100;
+        let realRank = 'N';
+        
+        if(type === 'premium') {
+             // 고급: UR, SSR 확률 높음
+            if(r < 5) realRank = 'UR';
+            else if(r < 25) realRank = 'SSR';
+            else if(r < 65) realRank = 'SR';
+            else if(r < 95) realRank = 'R';
+            else realRank = 'F'; 
+        } else {
+             // 일반: F급 확률 높음 (원래 맛 살림)
+            if(r < 2) realRank = 'SSR';      
+            else if(r < 32) realRank = 'F';  
+            else if(r < 42) realRank = 'SR'; 
+            else if(r < 62) realRank = 'R';
+            else realRank = 'N'; 
+        }
+
+        const jobList = DB.jobs[realRank];
+        const job = jobList[Math.floor(Math.random() * jobList.length)];
+        const name = (Math.random()<0.5?'유동':'고닉') + Math.floor(Math.random()*9999);
+        
+        // 기존 코드의 Power/Chaos 로직 유지
+        let power = DB.power[realRank];
+        let chaos = 5;
+        if(realRank === 'SSR' || realRank === 'UR') chaos = 0;
+        else if(realRank === 'SR') chaos = 5;
+        else if(realRank === 'F') chaos = 70;
+        else if(realRank === 'R') chaos = 10;
+
+        const p = { 
+            id: Math.random().toString(36).substr(2,9), 
+            realRank: realRank, 
+            displayRank: '???', 
+            name: name, 
+            job: '수습 완장', 
+            realJob: job, 
+            power: 5, 
+            realPower: power, 
+            chaos: chaos, 
+            revealed: false,
+            revealTimer: type==='premium' ? 3 : 8,
+            lv: 1, exp: 0 // 성장 시스템 추가
+        };
+
+        this.pasdaks.push(p);
+        this.showPop(p);
+        this.log(`🔰 [채용] ${p.name} 수습 파딱 임명 (심사 중...)`, 'l-sys');
+        this.renderSlots();
+        this.updateUI();
+        this.saveGame();
+    }
+
+    // 융합 관련 함수
+    toggleSelect(id) {
+        if(this.isOver) return;
+        const idx = this.selected.indexOf(id);
+        if(idx > -1) this.selected.splice(idx, 1);
+        else {
+            if(this.selected.length >= 2) this.selected.shift();
+            this.selected.push(id);
+        }
+        this.renderSlots(); // 선택 효과 갱신
+        this.updateAltar();
+    }
+
+    updateAltar() {
+        const p1 = this.pasdaks.find(p => p.id === this.selected[0]);
+        const p2 = this.pasdaks.find(p => p.id === this.selected[1]);
+
+        this.ui.slot1.className = p1 ? `altar-slot filled` : `altar-slot`;
+        this.ui.slot1.innerText = p1 ? `[${p1.displayRank}]` : "선택1";
+        
+        this.ui.slot2.className = p2 ? `altar-slot filled` : `altar-slot`;
+        this.ui.slot2.innerText = p2 ? `[${p2.displayRank}]` : "선택2";
+
+        this.ui.btnFuse.disabled = this.selected.length !== 2 || this.cp < 300;
+    }
+
+    fuse() {
+        if(this.selected.length !== 2 || this.cp < 300) return;
+        this.cp -= 300;
+
+        const p1 = this.pasdaks.find(p => p.id === this.selected[0]);
+        const p2 = this.pasdaks.find(p => p.id === this.selected[1]);
+        
+        // 재료 삭제
+        this.pasdaks = this.pasdaks.filter(p => !this.selected.includes(p.id));
+        this.selected = [];
+
+        // 융합 로직 (간단화)
+        const scoreMap = {N:1, R:2, SR:3, SSR:4, UR:5, F:0};
+        const s1 = scoreMap[p1.revealed ? p1.realRank : 'N'];
+        const s2 = scoreMap[p2.revealed ? p2.realRank : 'N'];
+        const avg = (s1 + s2) / 2;
+        
+        const r = Math.random();
+        let newRank = 'N';
+        
+        if (r < 0.15) newRank = 'F'; 
+        else if (r < 0.25 && avg >= 4) newRank = 'UR';
+        else if (avg >= 3.5) newRank = 'SSR';
+        else if (avg >= 2.5) newRank = 'SR';
+        else if (avg >= 1.5) newRank = 'R';
+        else newRank = 'N';
+
+        const jobList = DB.jobs[newRank];
+        const newP = {
+            id: Math.random().toString(36).substr(2,9),
+            realRank: newRank,
+            displayRank: newRank, // 융합체는 바로 공개
+            name: "키메라" + Math.floor(Math.random()*99),
+            job: jobList[Math.floor(Math.random()*jobList.length)],
+            realJob: jobList[Math.floor(Math.random()*jobList.length)],
+            power: DB.power[newRank],
+            realPower: DB.power[newRank],
+            chaos: newRank==='F'?70:5,
+            revealed: true,
+            revealTimer: 0,
+            lv: 1, exp: 0
+        };
+        this.pasdaks.push(newP);
+        
+        const logType = newRank === 'UR' ? 'l-ur' : (newRank === 'F' ? 'l-ban' : 'l-sys');
+        this.log(`🧬 [융합] ${p1.name} + ${p2.name} → [${newRank}] ${newP.name}`, logType);
+        
+        if(newRank === 'UR') {
+            this.showPop({name: newP.name, realRank: 'UR'}, false);
+        }
+        
+        this.renderSlots();
+        this.updateAltar();
+        this.saveGame();
+    }
+
+    kick(e, id) {
+        if(e) e.stopPropagation();
+        const idx = this.pasdaks.findIndex(p => p.id === id);
+        if(idx > -1) {
+            const p = this.pasdaks[idx];
+            this.log(`🚫 [해고] ${p.name} (${p.revealed ? p.realRank : '???'}) 방출됨.`, 'l-ban');
+            this.createFloatText("해고", `card-${p.id}`, "#aaa");
+            
+            this.pasdaks.splice(idx, 1);
+            this.selected = this.selected.filter(sid => sid !== id); // 선택중이면 해제
+            
+            this.stress = Math.max(0, this.stress - 2); // 해고하면 스트레스 약간 감소
+            
+            this.renderSlots();
+            this.updateAltar();
+            this.updateUI();
+            this.saveGame();
+        }
+    }
+
+    tick() {
+        if(this.isOver) return;
+
+        let totalGain = 0;
+        const isMentalBreakdown = this.stress >= 80;
+
+        this.pasdaks.forEach(p => {
+            if (!p.revealed) {
+                p.revealTimer--;
+                if (p.revealTimer <= 0) this.revealIdentity(p);
+            }
+
+            // 성장 시스템 (Code 2에서 가져옴)
+            p.exp++;
+            if(p.exp >= p.lv * 20) {
+                p.lv++; p.exp = 0;
+                if(Math.random() < 0.2) this.createFloatText("Lv UP!", `card-${p.id}`, "#2ecc71");
+            }
+
+            // CP 생산 (레벨 반영)
+            let currentPower = p.realPower + (p.lv * 2); 
+            if(p.realRank === 'F') currentPower = -15; // F급은 레벨 오르면 손해 더 커짐
+
+            // 상태 로그 업데이트 (Code 1의 찰진 로그)
+            const roll = Math.random() * 100;
+            let currentChaos = p.chaos;
+            if (isMentalBreakdown && ['SSR','SR'].includes(p.realRank)) currentChaos = 50; 
+
+            // 협동 이벤트 체크
+            let handled = false;
+            if (p.revealed && Math.random() < 0.03) { 
+                handled = this.handleCoop(p);
+            }
+
+            if (!handled) {
+                if (roll < currentChaos / 4) {
+                    this.triggerEvent(p, isMentalBreakdown);
+                } else {
+                    totalGain += currentPower;
+                    // 가끔 텍스트 업데이트
+                    if (Math.random() < 0.05) {
+                        const type = currentPower > 0 ? 'work' : 'idle';
+                        const txt = DB.logs[type][Math.floor(Math.random()*DB.logs[type].length)];
+                        const el = document.getElementById(`st-${p.id}`);
+                        if (el) { 
+                            el.innerText = txt; 
+                            el.style.color = type==='work' ? "#2ecc71" : "#7f8fa6"; 
+                        }
+                    } 
+                }
+            }
+        });
+
+        this.cp += totalGain;
+        
+        // 스트레스 로직
+        const fCount = this.pasdaks.filter(p => p.realRank === 'F' && p.revealed).length;
+        let stressInc = fCount * 0.4; 
+        if (totalGain < 0) stressInc += 0.5;
+        if (totalGain > 100) stressInc -= 0.1; // 돈 잘 벌리면 스트레스 감소
+        
+        this.stress = Math.min(100, Math.max(0, this.stress + stressInc));
+
+        if (this.stress >= 100) {
+            this.isOver = true;
+            document.getElementById('gameover').style.display = 'flex';
+        }
+
+        // Ticker 업데이트
+        if(isMentalBreakdown) {
+             this.ui.ticker.innerText = "🚨 경고: 멘탈 붕괴! 파딱들이 미쳐 날뛰고 있습니다! 🚨";
+             this.ui.ticker.style.color = "red";
+        } else if(Math.random() < 0.02) {
+            const msgs = ["야갤 침공 경보", "서버 불안정", "알바가 혐짤 삭제", "실베 등극", "유입 폭주 중"];
+            this.ui.ticker.innerText = "속보: " + msgs[Math.floor(Math.random()*msgs.length)];
+            this.ui.ticker.style.color = "#e67e22";
+        }
+
+        this.updateUI();
+        this.saveGame(); 
+    }
+
+    handleCoop(p) {
+        if (p.realRank === 'F') {
+            const partners = this.pasdaks.filter(t => t.id !== p.id && t.realRank === 'F' && t.revealed);
+            if (partners.length > 0) {
+                const partner = partners[Math.floor(Math.random() * partners.length)];
+                this.log(`🤮 [좆목] ${p.name} & ${partner.name}: 여론 조작 시도!`, 'l-coop-bad');
+                this.createFloatText("좆목", `card-${p.id}`, "#d63031");
+                this.stress += 5;
+                return true;
+            }
+        }
+        if (['SR', 'SSR', 'UR'].includes(p.realRank)) {
+            const partners = this.pasdaks.filter(t => t.id !== p.id && ['SR', 'SSR', 'UR'].includes(t.realRank) && t.revealed);
+            if (partners.length > 0) {
+                if (Math.random() < 0.3) {
+                    const fTargets = this.pasdaks.filter(t => t.realRank === 'F' && !t.revealed);
+                    if (fTargets.length > 0) {
+                        const target = fTargets[0];
+                        this.log(`⚖️ [숙청] ${p.name}: 숨어있던 분탕 ${target.name} 색출!`, 'l-coop-good');
+                        this.kick(null, target.id); // 자동 해고
+                        return true;
+                    }
+                }
+                const act = "갤러리 대청소";
+                this.log(`🤝 [동맹] ${p.name} & ${partners[0].name}: ${act}`, 'l-coop-good');
+                this.stress = Math.max(0, this.stress - 5);
+                this.cp += 50;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    revealIdentity(p) {
+        p.revealed = true;
+        p.displayRank = p.realRank;
+        p.job = p.realJob;
+        this.renderSlots();
+        this.updateAltar(); // 랭크 공개됐으니 제단도 업데이트
+        
+        let msgType = 'l-sys';
+        if(p.realRank === 'SSR' || p.realRank === 'UR') msgType = 'l-get';
+        if(p.realRank === 'F') msgType = 'l-ban';
+        
+        this.log(`🔍 [정체공개] ${p.name} = [${p.realRank}] ${p.job}`, msgType);
+        this.createFloatText(p.realRank, `card-${p.id}`, p.realRank=='SSR'?'#f1c40f':(p.realRank=='F'?'#ff4757':'#fff'));
+    }
+
+    triggerEvent(p, isMentalBreak) {
+        const r = Math.random();
+        
+        if (p.realRank === 'F' && p.revealed && r < 0.3) {
+            // F급의 테러 (무고 밴)
+            if(this.pasdaks.length > 1) {
+                const targets = this.pasdaks.filter(t => t.id !== p.id && t.realRank !== 'F');
+                if(targets.length > 0) {
+                    const target = targets[Math.floor(Math.random()*targets.length)];
+                    this.log(`🚨 [테러] ${p.name} 👉 ${target.name} 무고 밴 시전!`, 'l-ban');
+                    this.kick(null, target.id);
+                }
+            }
+        } 
+        else if (r < 0.4) { 
+            // 싸움
+            const fightMsg = DB.logs.fight[Math.floor(Math.random()*DB.logs.fight.length)];
+            this.log(`🥊 [전투] ${p.name}: ${fightMsg}`, 'l-ban');
+            const st = document.getElementById(`st-${p.id}`);
+            if(st) { st.innerText = "🤬 키배 중"; st.style.color = "#ff4757"; }
+            this.stress += 3;
+        }
+        else {
+            // 사고
+            const chaosMsg = DB.logs.chaos[Math.floor(Math.random()*DB.logs.chaos.length)];
+            const st = document.getElementById(`st-${p.id}`);
+            if(st) { st.innerText = chaosMsg; st.style.color = "#ff6b6b"; }
+            this.log(`⚠️ [사고] ${p.name}: ${chaosMsg}`, 'l-chaos');
+            this.stress += 2;
+        }
+    }
+
+    renderSlots() {
+        this.ui.grid.innerHTML = '';
+        this.pasdaks.forEach(p => {
+            const d = document.createElement('div');
+            const isSel = this.selected.includes(p.id);
+            const rankClass = p.revealed ? p.realRank : 'Hidden';
+            
+            d.className = `card ${rankClass} ${isSel ? 'selected' : ''}`;
+            d.id = `card-${p.id}`;
+            
+            // 융합 선택 기능 추가
+            d.onclick = () => this.toggleSelect(p.id);
+
+            d.innerHTML = `
+                <div class="c-top">
+                    <span class="c-rank ${rankClass}">${p.displayRank}</span>
+                    <button class="btn-fire" onclick="window.game.kick(event, '${p.id}')">해고</button>
+                </div>
+                <div class="c-name">${p.name}</div>
+                <div class="c-info">${p.job} <span style="font-size:0.7rem; color:#666;">Lv.${p.lv}</span></div>
+                <div class="c-status" id="st-${p.id}">${p.revealed ? '대기 중' : '심사 중...'}</div>
+            `;
+            this.ui.grid.appendChild(d);
+        });
+    }
+
+    updateUI() {
+        this.ui.cp.innerText = Math.floor(this.cp);
+        this.ui.stress.style.width = Math.min(100, this.stress) + '%';
+        this.ui.count.innerText = this.pasdaks.length;
+        
+        document.getElementById('cost-norm').innerText = this.costNorm + " CP";
+        document.getElementById('cost-prem').innerText = this.costPrem + " CP";
+        
+        this.ui.btnNorm.disabled = this.cp < this.costNorm || this.pasdaks.length >= this.maxSlots;
+        this.ui.btnPrem.disabled = this.cp < this.costPrem || this.pasdaks.length >= this.maxSlots;
+    }
+
+    log(msg, cls) {
+        const d = document.createElement('div');
+        d.className = `log ${cls||''}`; d.innerText = msg;
+        this.ui.logs.appendChild(d);
+        this.ui.logs.scrollTop = this.ui.logs.scrollHeight;
+    }
+
+    showPop(p, isHidden=true) {
+        if(isHidden && p.realRank !== 'UR') { // UR은 바로 공개되거나 다르게 처리 가능하지만 일단 통일
+            this.ui.popRank.innerText = "???";
+            this.ui.popRank.style.color = "#fff";
+            this.ui.popName.innerText = p.name;
+            this.ui.popDesc.innerText = "수습 완장 (정체 불명)";
+            this.ui.popCard.style.border = "4px dashed #777";
+            this.ui.popCard.style.boxShadow = "none";
+        } else {
+            // UR이거나 융합체일 경우
+            const colors = {UR:'#00cec9', SSR:'#f1c40f', SR:'#9b59b6'};
+            const color = colors[p.realRank] || '#fff';
+            this.ui.popRank.innerText = p.realRank;
+            this.ui.popRank.style.color = color;
+            this.ui.popName.innerText = p.name;
+            this.ui.popDesc.innerText = "전설의 완장 등판!";
+            this.ui.popCard.style.border = `4px solid ${color}`;
+            this.ui.popCard.style.boxShadow = `0 0 50px ${color}`;
+        }
+        
+        const ol = this.ui.overlay;
+        ol.classList.remove('active'); void ol.offsetWidth; ol.classList.add('active');
+        setTimeout(()=>ol.classList.remove('active'), 1000);
+    }
+
+    createFloatText(txt, cardId, color) {
+        const card = document.getElementById(cardId);
+        if(!card) return;
+        const el = document.createElement('div');
+        el.className = 'float-txt';
+        el.innerText = txt;
+        el.style.color = color;
+        el.style.left = (20 + Math.random() * 40) + '%';
+        el.style.top = '40%';
+        card.appendChild(el);
+        setTimeout(() => el.remove(), 800);
     }
 }
 
