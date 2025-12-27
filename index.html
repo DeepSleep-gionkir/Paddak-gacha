@@ -759,7 +759,10 @@ class Game {
         }
 
         this.updateUI();
-        this.saveGame(); 
+        // [최적화] 매 초 저장하지 않고, 3초에 한 번만 저장 (렉 방지)
+        // this.saveGame(); <-- 기존 코드 삭제 또는 주석 처리
+        if (new Date().getSeconds() % 3 === 0) { 
+            this.saveGame();
     }
 
     handleCoop(p) {
@@ -889,6 +892,12 @@ class Game {
         const d = document.createElement('div');
         d.className = `log ${cls||''}`; d.innerText = msg;
         this.ui.logs.appendChild(d);
+        
+        // [최적화] 로그가 75개 넘어가면 가장 오래된 것 삭제 (메모리 방어)
+        if (this.ui.logs.children.length > 75) {
+            this.ui.logs.removeChild(this.ui.logs.firstChild);
+        }
+        
         this.ui.logs.scrollTop = this.ui.logs.scrollHeight;
     }
 
@@ -918,15 +927,22 @@ class Game {
 
     createFloatText(txt, cardId, color) {
         const card = document.getElementById(cardId);
-        if(!card) return;
+        if(!card) return; // 카드가 없으면 실행 취소 (에러 방지)
+        
         const el = document.createElement('div');
         el.className = 'float-txt';
         el.innerText = txt;
         el.style.color = color;
+        // 위치를 약간 랜덤하게 해서 겹침 방지
         el.style.left = (20 + Math.random() * 40) + '%';
         el.style.top = '40%';
+        
         card.appendChild(el);
-        setTimeout(() => el.remove(), 800);
+        
+        // 메모리 누수 확실하게 방지하기 위해 요소가 존재하는지 확인 후 제거
+        setTimeout(() => {
+            if(el && el.parentNode) el.parentNode.removeChild(el);
+        }, 800);
     }
 }
 
