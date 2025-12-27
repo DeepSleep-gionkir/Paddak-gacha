@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>무한 파딱 가챠: SAVE EDITION</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>무한 파딱 가챠: FINAL FIX</title>
     <style>
         :root {
             --bg: #0d0d0d; --panel: #181818;
@@ -16,14 +16,18 @@
         body {
             margin: 0; padding: 0; background: var(--bg); color: var(--text);
             font-family: 'Pretendard', sans-serif;
-            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+            /* 핵심 수정: 높이 제한 해제, 스크롤 허용 */
+            min-height: 100vh;
+            overflow-y: auto; 
+            padding-bottom: 140px; /* 하단 버튼 공간 확보 */
         }
 
-        /* HEADER */
+        /* HEADER (Sticky Top) */
         header {
-            flex: 0 0 55px; background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center; padding: 0 15px;
-            z-index: 20;
+            position: sticky; top: 0;
+            background: rgba(13, 13, 13, 0.95); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; padding: 12px 15px;
+            z-index: 50; backdrop-filter: blur(5px);
         }
         .res-group { display: flex; align-items: center; gap: 8px; font-weight: bold; }
         .cp-val { color: var(--legend); font-size: 1.2rem; text-shadow: 0 0 8px rgba(255,165,2,0.4); }
@@ -33,13 +37,13 @@
         
         .reset-btn {
             background: #333; border: 1px solid #555; color: #aaa; 
-            padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; margin-left: 10px;
+            padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; margin-left: 10px;
         }
 
         /* TICKER */
         .ticker-wrap {
             background: #111; border-bottom: 1px solid var(--border);
-            overflow: hidden; display: flex; align-items: center; height: 28px; flex-shrink: 0;
+            overflow: hidden; display: flex; align-items: center; height: 30px;
         }
         .ticker {
             white-space: nowrap; animation: ticker 25s linear infinite;
@@ -47,67 +51,68 @@
         }
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* MAIN */
-        main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        /* MAIN LAYOUT */
+        main { padding: 15px; display: flex; flex-direction: column; gap: 20px; }
 
-        /* SLOTS (Top) */
+        /* SLOTS SECTION */
         #section-slots {
-            flex: 1; overflow-y: auto; padding: 10px; background: var(--bg);
-            scrollbar-width: thin; scrollbar-color: #444 #111;
+            background: var(--bg);
         }
-        .slot-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.85rem; color: #888; position: sticky; top: 0; background: var(--bg); padding: 5px 0; z-index: 5; }
+        .slot-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; color: #888; font-weight: bold; }
         
         .slot-grid { 
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; 
-            padding-bottom: 20px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; 
         }
         .card {
-            background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 8px;
-            position: relative; display: flex; flex-direction: column; gap: 3px; min-height: 90px;
+            background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px;
+            position: relative; display: flex; flex-direction: column; gap: 4px; min-height: 100px;
             transition: 0.1s;
         }
         .card.SSR { border: 2px solid var(--legend); background: radial-gradient(circle at top right, #332b00, var(--panel)); }
         .card.F { border: 2px solid var(--danger); background: #2a0e0e; }
         
         .c-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;}
-        .c-rank { font-size: 0.7rem; font-weight: 900; padding: 2px 5px; border-radius: 3px; color: #000; background: #aaa; }
+        .c-rank { font-size: 0.75rem; font-weight: 900; padding: 2px 6px; border-radius: 3px; color: #000; background: #aaa; }
         .c-rank.SSR { background: var(--legend); } .c-rank.F { background: var(--danger); color: #fff; }
         
-        .c-name { font-weight: bold; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .c-info { font-size: 0.75rem; color: #aaa; }
-        .c-status { font-size: 0.75rem; color: #777; margin-top: auto; min-height: 1.2em; font-weight: bold; }
+        .c-name { font-weight: bold; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .c-info { font-size: 0.8rem; color: #aaa; }
+        .c-status { font-size: 0.8rem; color: #777; margin-top: auto; min-height: 1.2em; font-weight: bold; }
         
-        .btn-kick { background: #333; color: #ddd; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.7rem; cursor: pointer; }
+        .btn-kick { background: #333; color: #ddd; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; }
         .btn-kick:active { background: var(--danger); color: #fff; }
 
-        /* LOGS (Bottom) */
+        /* LOGS SECTION */
         #section-logs {
-            flex: 0 0 35%; 
-            background: #000; padding: 10px; border-top: 2px solid var(--border);
-            font-family: 'D2Coding', monospace; font-size: 0.8rem; line-height: 1.6;
-            overflow-y: auto;
+            background: #000; padding: 10px; border: 1px solid var(--border); border-radius: 8px;
+            font-family: 'D2Coding', monospace; font-size: 0.85rem; line-height: 1.6;
+            height: 250px; overflow-y: auto; /* 로그만 따로 스크롤 가능 */
         }
         .log { margin-bottom: 2px; border-bottom: 1px solid #111; padding-bottom: 2px; }
-        .l-get { color: var(--legend); } .l-ban { color: var(--danger); } 
-        .l-chat { color: var(--rare); } .l-event { color: var(--epic); font-weight: bold; }
+        .l-get { color: var(--legend); } 
+        .l-ban { color: var(--danger); } 
+        .l-chat { color: var(--rare); }
+        .l-event { color: var(--epic); font-weight: bold; }
 
-        /* FOOTER */
+        /* FOOTER (Floating Button) */
         footer {
-            flex: 0 0 auto; background: rgba(24, 24, 24, 0.95); border-top: 1px solid var(--border);
-            padding: 10px 15px; padding-bottom: calc(15px + env(safe-area-inset-bottom));
-            display: flex; justify-content: center; z-index: 30;
+            position: fixed; bottom: 20px; left: 0; width: 100%;
+            display: flex; justify-content: center; pointer-events: none; /* 배경 터치 통과 */
+            z-index: 100;
         }
         #gacha-btn {
-            width: 100%; max-width: 600px; height: 55px;
+            pointer-events: auto; /* 버튼만 터치 가능 */
+            width: 90%; max-width: 500px; height: 65px;
             background: linear-gradient(135deg, #e67e22, #d35400);
-            color: white; border: none; border-radius: 10px;
-            font-size: 1.2rem; font-weight: 900; cursor: pointer;
+            color: white; border: none; border-radius: 15px;
+            font-size: 1.3rem; font-weight: 900; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 4px 0 #a04000; transition: 0.1s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: 0.1s;
+            border: 2px solid #fff;
         }
-        #gacha-btn:active { transform: translateY(4px); box-shadow: none; }
-        #gacha-btn:disabled { filter: grayscale(1); opacity: 0.5; transform: translateY(4px); box-shadow: none; }
-        .cost-label { font-size: 0.8rem; font-weight: normal; opacity: 0.9; }
+        #gacha-btn:active { transform: scale(0.96); }
+        #gacha-btn:disabled { filter: grayscale(1); opacity: 0.6; transform: scale(1); }
+        .cost-label { font-size: 0.85rem; font-weight: normal; opacity: 0.9; margin-top: 2px;}
 
         /* OVERLAYS */
         .overlay {
@@ -119,11 +124,11 @@
             background: var(--panel); border: 2px solid var(--legend); border-radius: 20px;
             padding: 40px; text-align: center; transform: scale(0.5); opacity: 0;
             animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            box-shadow: 0 0 50px rgba(255, 165, 2, 0.4);
+            box-shadow: 0 0 50px rgba(255, 165, 2, 0.4); pointer-events: auto;
         }
         .float-txt {
             position: absolute; font-weight: bold; pointer-events: none; z-index: 100;
-            text-shadow: 1px 1px 0 #000; animation: floatUp 1s forwards; font-size: 1rem;
+            text-shadow: 1px 1px 0 #000; animation: floatUp 1s forwards; font-size: 1.1rem;
         }
         #gameover { pointer-events: auto; background: rgba(0,0,0,0.95); }
 
@@ -148,7 +153,7 @@
     </header>
 
     <div class="ticker-wrap">
-        <div class="ticker" id="ui-ticker">시스템: 자동 저장 모듈이 활성화되었습니다. 새로고침해도 데이터가 유지됩니다...</div>
+        <div class="ticker" id="ui-ticker">시스템: 슬롯 확장 및 자동 저장 모듈 가동... 대규모 채용을 시작하세요...</div>
     </div>
 
     <main>
@@ -160,13 +165,16 @@
             <div id="slot-grid" class="slot-grid">
                 <div style="grid-column: span 2; text-align:center; padding: 60px 20px; color:#444;">
                     <div style="font-size:2rem; margin-bottom:10px;">💾</div>
-                    데이터 불러오는 중...<br>또는 파딱이 없습니다.
+                    데이터 로드 중...<br>또는 파딱이 없습니다.
                 </div>
             </div>
         </section>
 
-        <section id="section-logs">
-            <div class="log l-sys">저장된 데이터 로드 완료.</div>
+        <section>
+            <div style="color:#888; font-size:0.9rem; margin-bottom:5px; font-weight:bold;">활동 로그</div>
+            <div id="section-logs">
+                <div class="log l-sys">시스템 가동. 저장된 데이터 로드 완료.</div>
+            </div>
         </section>
     </main>
 
@@ -186,12 +194,12 @@
 
     <div id="gameover" class="overlay">
         <h1 style="color:var(--danger); font-size:3rem; margin-bottom:20px;">GAME OVER</h1>
-        <p style="color:#ccc; margin-bottom:40px;">갤러리가 폭파되었습니다.</p>
+        <p style="color:#ccc; margin-bottom:40px;">갤러리가 폭파되었습니다.<br>멘탈이 바닥났습니다.</p>
         <button onclick="game.hardReset()" style="padding:15px 40px; border-radius:30px; border:none; background:var(--accent); color:#fff; font-weight:bold; font-size:1.2rem; cursor:pointer;">새 지구 파기</button>
     </div>
 
 <script>
-/* ================= DATABASE ================= */
+/* ================= DATABASE (V11 Expansion) ================= */
 const DB = {
     jobs: {
         N: ['눈팅족', '개추봇', '댓글러', '유동', '질문충', '핑프', '복붙러'],
@@ -203,22 +211,25 @@ const DB = {
     logs: {
         work: [
             "광고글 삭제", "야짤 컷", "도배 차단", "할카스 제거", "실베 방어", "분탕 VPN 컷", 
-            "정보글 념글행", "공지 갱신", "유입 질문 답변", "분쟁글 중재", "낚시글 삭제"
+            "정보글 념글행", "공지 갱신", "유입 질문 답변", "분쟁글 중재", "낚시글 삭제",
+            "혐오 조장글 삭제", "도배기 방어", "매크로 차단", "신고글 처리"
         ],
         fight: [
             "30일 차단 먹임", "저격글 작성", "과거글 털기", "신상 털기", "고소 협박", "키보드 배틀", 
-            "현피 신청", "부모님 안부 물음", "IP 추적 협박"
+            "현피 신청", "부모님 안부 물음", "IP 추적 협박", "고닉 죽이기", "완장질 시전"
         ],
         idle: [
-            "갤질 중...", "F5 연타 중...", "라면 먹는 중...", "애니 보는 중...", "현타 옴", "월급 루팡 중"
+            "갤질 중...", "F5 연타 중...", "라면 먹는 중...", "애니 보는 중...", "현타 옴", "월급 루팡 중",
+            "졸고 있음...", "딴 갤 눈팅 중...", "유튜브 보는 중...", "치킨 시키는 중..."
         ],
         chaos: [
-            "갤기장 만드는 중", "야짤 달리는 중", "혐짤 테러 중", "헛소리 하는 중", "정치떡밥 굴리는 중"
+            "갤기장 만드는 중", "야짤 달리는 중", "혐짤 테러 중", "헛소리 하는 중", "정치떡밥 굴리는 중",
+            "타갤에 좌표 찍는 중", "주작기 돌리는 중", "자기 글 념글 보내는 중"
         ]
     }
 };
 
-const SAVE_KEY = "pasdak_save_v1";
+const SAVE_KEY = "pasdak_save_v11";
 
 /* ================= LOGIC ================= */
 class Game {
@@ -244,15 +255,16 @@ class Game {
             ticker: document.getElementById('ui-ticker')
         };
 
-        this.loadGame(); // Load data on start
+        this.loadGame(); 
         this.renderSlots();
         this.updateUI();
         
-        setInterval(() => this.tick(), 1000); // Main Loop
+        setInterval(() => this.tick(), 1000); 
     }
 
     /* --- Save & Load --- */
     saveGame() {
+        if(this.isOver) return;
         const data = {
             cp: this.cp,
             stress: this.stress,
@@ -273,7 +285,7 @@ class Game {
                 this.pasdaks = parsed.pasdaks || [];
                 this.log("저장된 게임을 불러왔습니다.", "l-sys");
             } catch (e) {
-                console.error("Save file corrupted", e);
+                console.error("Save corrupted", e);
             }
         }
     }
@@ -319,7 +331,7 @@ class Game {
         this.log(`[${rank}] ${p.name} (${p.job}) 영입 성공!`, 'l-get');
         this.renderSlots();
         this.updateUI();
-        this.saveGame(); // Save on pull
+        this.saveGame();
     }
 
     kick(id) {
@@ -332,7 +344,7 @@ class Game {
             this.cost = Math.max(100, Math.floor(this.cost * 0.95));
             this.renderSlots();
             this.updateUI();
-            this.saveGame(); // Save on kick
+            this.saveGame();
         }
     }
 
@@ -345,11 +357,9 @@ class Game {
         this.pasdaks.forEach(p => {
             const roll = Math.random() * 100;
 
-            // Chaos Event
             if (roll < p.chaos / 5) { 
                 this.triggerEvent(p);
             } 
-            // Work
             else {
                 totalGain += p.power;
                 if (Math.random() < 0.1) {
@@ -382,7 +392,7 @@ class Game {
 
         if (this.stress >= 100) {
             this.isOver = true;
-            localStorage.removeItem(SAVE_KEY); // Wipe save on death
+            localStorage.removeItem(SAVE_KEY); 
             document.getElementById('gameover').style.display = 'flex';
         }
 
@@ -393,7 +403,7 @@ class Game {
         }
 
         this.updateUI();
-        this.saveGame(); // Auto save every tick
+        this.saveGame(); 
     }
 
     triggerEvent(p) {
@@ -431,6 +441,12 @@ class Game {
             this.log(`💨 [${p.name}]이(가) 멘탈이 터져서 탈주했습니다.`, 'l-ban');
             this.kick(p.id);
         }
+        else {
+            const chaosMsg = DB.logs.chaos[Math.floor(Math.random()*DB.logs.chaos.length)];
+            const st = document.getElementById(`st-${p.id}`);
+            if(st) { st.innerText = chaosMsg; st.style.color = "#ff4757"; }
+            if(p.rank === 'F') this.stress += 1;
+        }
     }
 
     renderSlots() {
@@ -463,7 +479,7 @@ class Game {
         this.ui.cp.innerText = Math.floor(this.cp);
         this.ui.stress.style.width = Math.min(100, this.stress) + '%';
         this.ui.count.innerText = this.pasdaks.length;
-        this.ui.cost.innerText = this.pasdaks.length >= this.maxSlots ? "FULL" : `${this.cost} CP`;
+        this.ui.cost.innerText = this.pasdaks.length >= this.maxSlots ? "SLOT FULL" : `${this.cost} CP`;
         this.ui.btn.disabled = this.cp < this.cost || this.pasdaks.length >= this.maxSlots;
     }
 
