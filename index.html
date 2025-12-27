@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>무한 파딱 가챠: V11 CHAOS</title>
+    <title>무한 파딱 가챠: SAVE EDITION</title>
     <style>
         :root {
             --bg: #0d0d0d; --panel: #181818;
@@ -30,6 +30,11 @@
         .stress-container { width: 100px; height: 10px; background: #333; border-radius: 5px; overflow: hidden; position: relative;}
         .stress-bar { height: 100%; width: 0%; background: var(--danger); transition: width 0.3s; }
         .stress-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 8px; color: #fff; text-shadow: 1px 1px 0 #000; }
+        
+        .reset-btn {
+            background: #333; border: 1px solid #555; color: #aaa; 
+            padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; margin-left: 10px;
+        }
 
         /* TICKER */
         .ticker-wrap {
@@ -48,7 +53,6 @@
         /* SLOTS (Top) */
         #section-slots {
             flex: 1; overflow-y: auto; padding: 10px; background: var(--bg);
-            /* 스크롤바 디자인 */
             scrollbar-width: thin; scrollbar-color: #444 #111;
         }
         .slot-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.85rem; color: #888; position: sticky; top: 0; background: var(--bg); padding: 5px 0; z-index: 5; }
@@ -78,16 +82,14 @@
 
         /* LOGS (Bottom) */
         #section-logs {
-            flex: 0 0 35%; /* 화면 35% 고정 */
+            flex: 0 0 35%; 
             background: #000; padding: 10px; border-top: 2px solid var(--border);
             font-family: 'D2Coding', monospace; font-size: 0.8rem; line-height: 1.6;
             overflow-y: auto;
         }
         .log { margin-bottom: 2px; border-bottom: 1px solid #111; padding-bottom: 2px; }
-        .l-get { color: var(--legend); } 
-        .l-ban { color: var(--danger); } 
-        .l-chat { color: var(--rare); }
-        .l-event { color: var(--epic); font-weight: bold; }
+        .l-get { color: var(--legend); } .l-ban { color: var(--danger); } 
+        .l-chat { color: var(--rare); } .l-event { color: var(--epic); font-weight: bold; }
 
         /* FOOTER */
         footer {
@@ -136,16 +138,17 @@
         <div class="res-group">
             💎 <span id="ui-cp" class="cp-val">0</span>
         </div>
-        <div class="res-group" style="font-size:0.8rem; color:#aaa; flex-direction:column; align-items:flex-end; gap:2px;">
+        <div class="res-group">
             <div class="stress-container">
                 <div id="ui-stress" class="stress-bar"></div>
                 <div class="stress-label">MENTAL</div>
             </div>
+            <button class="reset-btn" onclick="game.hardReset()">초기화</button>
         </div>
     </header>
 
     <div class="ticker-wrap">
-        <div class="ticker" id="ui-ticker">시스템: 슬롯이 15개로 확장되었습니다... 대규모 파딱 채용을 시작하세요...</div>
+        <div class="ticker" id="ui-ticker">시스템: 자동 저장 모듈이 활성화되었습니다. 새로고침해도 데이터가 유지됩니다...</div>
     </div>
 
     <main>
@@ -156,14 +159,14 @@
             </div>
             <div id="slot-grid" class="slot-grid">
                 <div style="grid-column: span 2; text-align:center; padding: 60px 20px; color:#444;">
-                    <div style="font-size:2rem; margin-bottom:10px;">👻</div>
-                    아직 고용된 파딱이 없습니다.<br>하단 버튼으로 노예를 소환하세요.
+                    <div style="font-size:2rem; margin-bottom:10px;">💾</div>
+                    데이터 불러오는 중...<br>또는 파딱이 없습니다.
                 </div>
             </div>
         </section>
 
         <section id="section-logs">
-            <div class="log l-sys">시스템 가동. 슬롯 확장팩 적용 완료.</div>
+            <div class="log l-sys">저장된 데이터 로드 완료.</div>
         </section>
     </main>
 
@@ -178,14 +181,13 @@
         <div class="pop-card">
             <div id="pop-rank" style="font-size:3.5rem; font-weight:900; margin-bottom:10px;">SSR</div>
             <div id="pop-name" style="font-size:1.5rem; color:#fff; margin-bottom:5px;">전설의 파딱</div>
-            <div id="pop-desc" style="font-size:0.9rem; color:#aaa;">특성 설명</div>
         </div>
     </div>
 
     <div id="gameover" class="overlay">
         <h1 style="color:var(--danger); font-size:3rem; margin-bottom:20px;">GAME OVER</h1>
-        <p style="color:#ccc; margin-bottom:40px;">갤러리가 폭파되었습니다.<br>파딱들이 전부 도망갔습니다.</p>
-        <button onclick="location.reload()" style="padding:15px 40px; border-radius:30px; border:none; background:var(--accent); color:#fff; font-weight:bold; font-size:1.2rem; cursor:pointer;">새 지구 파기</button>
+        <p style="color:#ccc; margin-bottom:40px;">갤러리가 폭파되었습니다.</p>
+        <button onclick="game.hardReset()" style="padding:15px 40px; border-radius:30px; border:none; background:var(--accent); color:#fff; font-weight:bold; font-size:1.2rem; cursor:pointer;">새 지구 파기</button>
     </div>
 
 <script>
@@ -198,36 +200,34 @@ const DB = {
         SSR: ['김유식조카', '서버관리자', '빛의완장', 'AI알바', '디시의현자', '마유식'],
         F: ['분탕충', '타갤첩자', '좆목대장', '권력남용', '컨셉충', '네임드호소인']
     },
-    // Events & Logs Database expanded x3
     logs: {
         work: [
             "광고글 삭제", "야짤 컷", "도배 차단", "할카스 제거", "실베 방어", "분탕 VPN 컷", 
-            "정보글 념글행", "공지 갱신", "유입 질문 답변", "분쟁글 중재", "낚시글 삭제",
-            "혐오 조장글 삭제", "도배기 방어", "매크로 차단", "신고글 처리"
+            "정보글 념글행", "공지 갱신", "유입 질문 답변", "분쟁글 중재", "낚시글 삭제"
         ],
         fight: [
             "30일 차단 먹임", "저격글 작성", "과거글 털기", "신상 털기", "고소 협박", "키보드 배틀", 
-            "현피 신청", "부모님 안부 물음", "IP 추적 협박", "고닉 죽이기", "완장질 시전"
+            "현피 신청", "부모님 안부 물음", "IP 추적 협박"
         ],
         idle: [
-            "갤질 중...", "F5 연타 중...", "라면 먹는 중...", "애니 보는 중...", "현타 옴", "월급 루팡 중",
-            "졸고 있음...", "딴 갤 눈팅 중...", "유튜브 보는 중...", "치킨 시키는 중..."
+            "갤질 중...", "F5 연타 중...", "라면 먹는 중...", "애니 보는 중...", "현타 옴", "월급 루팡 중"
         ],
-        chaos: [ // New Chaos Events
-            "갤기장 만드는 중", "야짤 달리는 중", "혐짤 테러 중", "헛소리 하는 중", "정치떡밥 굴리는 중",
-            "타갤에 좌표 찍는 중", "주작기 돌리는 중", "자기 글 념글 보내는 중"
+        chaos: [
+            "갤기장 만드는 중", "야짤 달리는 중", "혐짤 테러 중", "헛소리 하는 중", "정치떡밥 굴리는 중"
         ]
     }
 };
 
+const SAVE_KEY = "pasdak_save_v1";
+
 /* ================= LOGIC ================= */
 class Game {
     constructor() {
-        this.cp = 500; // Increased starting CP
+        this.cp = 500;
         this.stress = 0;
         this.cost = 100;
         this.pasdaks = [];
-        this.maxSlots = 15; // Expanded Slots
+        this.maxSlots = 15;
         this.isOver = false;
 
         this.ui = {
@@ -241,34 +241,69 @@ class Game {
             overlay: document.getElementById('overlay'),
             popRank: document.getElementById('pop-rank'),
             popName: document.getElementById('pop-name'),
-            popDesc: document.getElementById('pop-desc'),
             ticker: document.getElementById('ui-ticker')
         };
 
+        this.loadGame(); // Load data on start
+        this.renderSlots();
         this.updateUI();
+        
         setInterval(() => this.tick(), 1000); // Main Loop
     }
 
+    /* --- Save & Load --- */
+    saveGame() {
+        const data = {
+            cp: this.cp,
+            stress: this.stress,
+            cost: this.cost,
+            pasdaks: this.pasdaks
+        };
+        localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    }
+
+    loadGame() {
+        const data = localStorage.getItem(SAVE_KEY);
+        if (data) {
+            try {
+                const parsed = JSON.parse(data);
+                this.cp = parsed.cp;
+                this.stress = parsed.stress;
+                this.cost = parsed.cost;
+                this.pasdaks = parsed.pasdaks || [];
+                this.log("저장된 게임을 불러왔습니다.", "l-sys");
+            } catch (e) {
+                console.error("Save file corrupted", e);
+            }
+        }
+    }
+
+    hardReset() {
+        if(confirm("모든 데이터를 삭제하고 처음부터 시작하시겠습니까?")) {
+            localStorage.removeItem(SAVE_KEY);
+            location.reload();
+        }
+    }
+
+    /* --- Core Actions --- */
     pull() {
         if(this.cp < this.cost || this.pasdaks.length >= this.maxSlots) return;
 
         this.cp -= this.cost;
-        this.cost = Math.floor(this.cost * 1.15); // Slower inflation for more slots
+        this.cost = Math.floor(this.cost * 1.15); 
 
         const r = Math.random() * 100;
         let rank = 'N';
-        if (r < 4) rank = 'SSR';      // 4%
-        else if (r < 14) rank = 'F';  // 10%
-        else if (r < 30) rank = 'SR'; // 16%
-        else if (r < 60) rank = 'R';  // 30%
+        if (r < 4) rank = 'SSR';      
+        else if (r < 14) rank = 'F';  
+        else if (r < 30) rank = 'SR'; 
+        else if (r < 60) rank = 'R';  
 
         const jobList = DB.jobs[rank];
         const job = jobList[Math.floor(Math.random() * jobList.length)];
         const name = (Math.random()<0.5?'유동':'고닉') + Math.floor(Math.random()*9999);
         
-        // Stats definition
-        let power = 5;
-        let chaos = 5;
+        let power = 5; let chaos = 5;
         if(rank === 'SSR') { power = 50; chaos = 0; }
         else if(rank === 'SR') { power = 20; chaos = 5; }
         else if(rank === 'F') { power = -15; chaos = 60; }
@@ -284,6 +319,7 @@ class Game {
         this.log(`[${rank}] ${p.name} (${p.job}) 영입 성공!`, 'l-get');
         this.renderSlots();
         this.updateUI();
+        this.saveGame(); // Save on pull
     }
 
     kick(id) {
@@ -296,40 +332,36 @@ class Game {
             this.cost = Math.max(100, Math.floor(this.cost * 0.95));
             this.renderSlots();
             this.updateUI();
+            this.saveGame(); // Save on kick
         }
     }
 
+    /* --- Loop --- */
     tick() {
         if(this.isOver) return;
 
         let totalGain = 0;
 
-        // Process each Pasdak
         this.pasdaks.forEach(p => {
             const roll = Math.random() * 100;
 
-            // 1. Chaos Event (Bad things)
-            if (roll < p.chaos / 5) { // Adjusted probability
+            // Chaos Event
+            if (roll < p.chaos / 5) { 
                 this.triggerEvent(p);
             } 
-            // 2. Work (Good things)
+            // Work
             else {
                 totalGain += p.power;
-                
-                // Visual Text Logic (Reduced frequency for optimization)
                 if (Math.random() < 0.1) {
-                    const statusId = `st-${p.id}`;
-                    const el = document.getElementById(statusId);
+                    const el = document.getElementById(`st-${p.id}`);
                     if (el) {
-                        const txt = DB.logs.work[Math.floor(Math.random()*DB.logs.work.length)];
-                        el.innerText = txt;
+                        el.innerText = DB.logs.work[Math.floor(Math.random()*DB.logs.work.length)];
                         el.style.color = "#2ecc71";
                     }
                     if (p.power > 0) this.createFloatText(`+${p.power}`, `card-${p.id}`, "#2ecc71");
                 } 
                 else if (Math.random() < 0.05) {
-                    const statusId = `st-${p.id}`;
-                    const el = document.getElementById(statusId);
+                    const el = document.getElementById(`st-${p.id}`);
                     if(el) {
                          el.innerText = DB.logs.idle[Math.floor(Math.random()*DB.logs.idle.length)];
                          el.style.color = "#777";
@@ -340,38 +372,34 @@ class Game {
 
         this.cp += totalGain;
         
-        // Stress Calculation
+        // Stress
         const fCount = this.pasdaks.filter(p => p.rank === 'F').length;
         let stressInc = fCount * 0.5;
         if(totalGain < 0) stressInc += 0.5;
-        
-        // Natural Heal if profitable
         if(totalGain > 0 && this.pasdaks.length > 0) stressInc -= 0.2;
         
         this.stress = Math.min(100, Math.max(0, this.stress + stressInc));
 
         if (this.stress >= 100) {
             this.isOver = true;
+            localStorage.removeItem(SAVE_KEY); // Wipe save on death
             document.getElementById('gameover').style.display = 'flex';
         }
 
-        // Random Ticker
+        // Ticker
         if(Math.random() < 0.02) {
             const msgs = ["야갤 침공 경보", "서버 불안정", "알바가 혐짤 삭제", "실베 등극", "유입 폭주 중"];
             this.ui.ticker.innerText = "속보: " + msgs[Math.floor(Math.random()*msgs.length)];
         }
 
         this.updateUI();
+        this.saveGame(); // Auto save every tick
     }
 
     triggerEvent(p) {
-        // Diverse events based on rank or random
         const r = Math.random();
-        let msg = "";
-        let type = 'l-chat';
-
+        
         if (p.rank === 'F' && r < 0.3) {
-            // F-Rank Special: Ban someone randomly
             if(this.pasdaks.length > 1) {
                 const target = this.pasdaks[Math.floor(Math.random()*this.pasdaks.length)];
                 if(target.id !== p.id) {
@@ -382,40 +410,35 @@ class Game {
                 }
             }
         } 
-        else if (r < 0.3) { // Fight
-            const target = this.pasdaks[Math.floor(Math.random()*this.pasdaks.length)];
-            if(target.id !== p.id) {
-                const fightMsg = DB.logs.fight[Math.floor(Math.random()*DB.logs.fight.length)];
-                this.log(`[${p.name}] vs [${target.name}]: ${fightMsg}`, 'l-chat');
-                const st = document.getElementById(`st-${p.id}`);
-                if(st) { st.innerText = "🤬 키배 중"; st.style.color = "#ff4757"; }
-                this.stress += 2;
+        else if (r < 0.3) { 
+            if(this.pasdaks.length > 1) {
+                const target = this.pasdaks[Math.floor(Math.random()*this.pasdaks.length)];
+                if(target.id !== p.id) {
+                    const fightMsg = DB.logs.fight[Math.floor(Math.random()*DB.logs.fight.length)];
+                    this.log(`[${p.name}] vs [${target.name}]: ${fightMsg}`, 'l-chat');
+                    const st = document.getElementById(`st-${p.id}`);
+                    if(st) { st.innerText = "🤬 키배 중"; st.style.color = "#ff4757"; }
+                    this.stress += 2;
+                }
             }
         }
-        else if (r < 0.5) { // Weird behavior
-            const chaosMsg = DB.logs.chaos[Math.floor(Math.random()*DB.logs.chaos.length)];
-            const st = document.getElementById(`st-${p.id}`);
-            if(st) { st.innerText = chaosMsg; st.style.color = "#ff4757"; }
-            if(p.rank === 'F') this.stress += 1;
-        }
-        else if (r > 0.9 && p.rank === 'F') { // Embezzlement
+        else if (r > 0.9 && p.rank === 'F') { 
             this.log(`💸 [${p.name}]이(가) 운영비를 횡령했습니다! (-50 CP)`, 'l-ban');
             this.cp -= 50;
             this.createFloatText("-50", `card-${p.id}`, "#ff4757");
         }
-        else if (r > 0.95) { // Run away
+        else if (r > 0.95) { 
             this.log(`💨 [${p.name}]이(가) 멘탈이 터져서 탈주했습니다.`, 'l-ban');
             this.kick(p.id);
         }
     }
 
-    /* --- HELPERS --- */
     renderSlots() {
         this.ui.slots.innerHTML = '';
         if(this.pasdaks.length === 0) {
             this.ui.slots.innerHTML = `<div style="grid-column: span 2; text-align:center; padding: 60px 20px; color:#444;">
                 <div style="font-size:2rem; margin-bottom:10px;">👻</div>
-                아직 고용된 파딱이 없습니다.<br>하단 버튼으로 노예를 소환하세요.
+                고용된 파딱이 없습니다.<br>하단 버튼으로 노예를 소환하세요.
             </div>`;
             return;
         }
@@ -440,7 +463,7 @@ class Game {
         this.ui.cp.innerText = Math.floor(this.cp);
         this.ui.stress.style.width = Math.min(100, this.stress) + '%';
         this.ui.count.innerText = this.pasdaks.length;
-        this.ui.cost.innerText = this.pasdaks.length >= this.maxSlots ? "SLOT FULL" : `${this.cost} CP`;
+        this.ui.cost.innerText = this.pasdaks.length >= this.maxSlots ? "FULL" : `${this.cost} CP`;
         this.ui.btn.disabled = this.cp < this.cost || this.pasdaks.length >= this.maxSlots;
     }
 
@@ -455,7 +478,6 @@ class Game {
         this.ui.popRank.innerText = p.rank;
         this.ui.popRank.style.color = p.rank=='SSR'?'#f1c40f':(p.rank=='F'?'#ff4757':'#fff');
         this.ui.popName.innerText = p.name;
-        this.ui.popDesc.innerText = `직업: ${p.job} | 전투력: ${p.power}`;
         
         const ol = this.ui.overlay;
         ol.classList.remove('active'); void ol.offsetWidth; ol.classList.add('active');
@@ -465,15 +487,12 @@ class Game {
     createFloatText(txt, cardId, color) {
         const card = document.getElementById(cardId);
         if(!card) return;
-        
         const el = document.createElement('div');
         el.className = 'float-txt';
         el.innerText = txt;
         el.style.color = color;
-        // Random position within card
         el.style.left = (20 + Math.random() * 40) + '%';
         el.style.top = '40%';
-        
         card.appendChild(el);
         setTimeout(() => el.remove(), 800);
     }
