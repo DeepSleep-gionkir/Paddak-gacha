@@ -314,12 +314,22 @@ class Game {
 
         // 1. 진짜 등급 결정
         const r = Math.random() * 100;
-        let realRank = 'N';
-        if (r < 4) realRank = 'SSR';      
-        else if (r < 14) realRank = 'F';  
-        else if (r < 30) realRank = 'SR'; 
-        else if (r < 60) realRank = 'R';  
-
+        if (r < 4) {
+            realRank = 'SSR';      // [4%] SSR 등급
+        } 
+        else if (r < 34) {         
+            // ★ F급 확률 조정: 4 ~ 34 (정확히 30% 확률) ★
+            realRank = 'F';        
+        } 
+        else if (r < 54) {
+            realRank = 'SR';       // [20%] SR 등급
+        } 
+        else if (r < 74) {
+            realRank = 'R';        // [20%] R 등급
+        } 
+        else {
+            realRank = 'N';        // [26%] N 등급
+        }
         const jobList = DB.jobs[realRank];
         const job = jobList[Math.floor(Math.random() * jobList.length)];
         const name = (Math.random()<0.5?'유동':'고닉') + Math.floor(Math.random()*9999);
