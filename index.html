@@ -3,138 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>무한 파딱 가챠: FINAL FIX</title>
+    <title>무한 파딱 가챠: VISUAL MASTER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0d0d0d; --panel: #181818;
-            --accent: #e67e22; --danger: #ff4757; --success: #2ed573;
-            --rare: #1e90ff; --epic: #a55eea; --legend: #ffa502;
-            --trash: #747d8c; --text: #f1f2f6; --border: #333;
+            --bg: #121212; --panel: #1e1e1e;
+            --accent: #e67e22; --danger: #eb4d4b; --success: #6ab04c;
+            --n-color: #95a5a6;
+            --r-color: #3498db;
+            --sr-color: #9b59b6;
+            --ssr-color: #f1c40f;
+            --f-color: #c0392b;
+            --text: #f5f6fa; --border: #333;
         }
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
         
         body {
             margin: 0; padding: 0; background: var(--bg); color: var(--text);
-            font-family: 'Pretendard', sans-serif;
-            /* 핵심 수정: 높이 제한 해제, 스크롤 허용 */
-            min-height: 100vh;
-            overflow-y: auto; 
-            padding-bottom: 140px; /* 하단 버튼 공간 확보 */
+            /* 폰트 변경: 제목은 둥근 Jua체, 본문은 고딕 */
+            font-family: 'Noto Sans KR', sans-serif;
+            min-height: 100vh; overflow-y: auto; padding-bottom: 140px;
+        }
+        
+        h1, h2, h3, .pop-rank, .c-rank, #gacha-btn, .res-group {
+            font-family: 'Jua', sans-serif; /* 포인트 폰트 */
         }
 
-        /* HEADER (Sticky Top) */
+        /* HEADER */
         header {
-            position: sticky; top: 0;
-            background: rgba(13, 13, 13, 0.95); border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 50;
+            background: rgba(18, 18, 18, 0.95); border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center; padding: 12px 15px;
-            z-index: 50; backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px); box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .res-group { display: flex; align-items: center; gap: 8px; font-weight: bold; }
-        .cp-val { color: var(--legend); font-size: 1.2rem; text-shadow: 0 0 8px rgba(255,165,2,0.4); }
-        .stress-container { width: 100px; height: 10px; background: #333; border-radius: 5px; overflow: hidden; position: relative;}
-        .stress-bar { height: 100%; width: 0%; background: var(--danger); transition: width 0.3s; }
-        .stress-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 8px; color: #fff; text-shadow: 1px 1px 0 #000; }
+        .cp-val { color: var(--ssr-color); font-size: 1.4rem; text-shadow: 0 0 10px rgba(241,196,15,0.3); letter-spacing: 1px; }
+        
+        .stress-container { 
+            width: 120px; height: 14px; background: #2f3640; border-radius: 7px; 
+            overflow: hidden; position: relative; border: 1px solid #444;
+        }
+        .stress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #e17055, #d63031); transition: width 0.3s; }
+        .stress-label { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            font-size: 10px; color: #fff; text-shadow: 1px 1px 1px #000; letter-spacing: 1px;
+        }
         
         .reset-btn {
-            background: #333; border: 1px solid #555; color: #aaa; 
-            padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; margin-left: 10px;
+            background: #2f3640; border: 1px solid #555; color: #dcdde1; 
+            padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; margin-left: 10px;
+            font-family: 'Jua', sans-serif;
         }
 
         /* TICKER */
         .ticker-wrap {
-            background: #111; border-bottom: 1px solid var(--border);
-            overflow: hidden; display: flex; align-items: center; height: 30px;
+            background: #000; border-bottom: 1px solid var(--border);
+            overflow: hidden; display: flex; align-items: center; height: 32px;
         }
         .ticker {
             white-space: nowrap; animation: ticker 25s linear infinite;
-            padding-left: 100%; color: var(--accent); font-size: 0.85rem;
+            padding-left: 100%; color: var(--accent); font-size: 0.9rem; font-family: 'Jua', sans-serif;
         }
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* MAIN LAYOUT */
+        /* MAIN */
         main { padding: 15px; display: flex; flex-direction: column; gap: 20px; }
 
-        /* SLOTS SECTION */
-        #section-slots {
-            background: var(--bg);
+        /* SLOTS */
+        #section-slots { background: transparent; }
+        .slot-header { 
+            display: flex; justify-content: space-between; margin-bottom: 10px; 
+            font-size: 1rem; color: #7f8fa6; font-family: 'Jua', sans-serif; 
         }
-        .slot-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; color: #888; font-weight: bold; }
         
-        .slot-grid { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; 
-        }
+        .slot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        /* CARD DESIGN (Visual Upgrade) */
         .card {
-            background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px;
-            position: relative; display: flex; flex-direction: column; gap: 4px; min-height: 100px;
-            transition: 0.1s;
+            background: var(--panel); border: 1px solid #444; border-radius: 10px; padding: 10px;
+            position: relative; display: flex; flex-direction: column; gap: 5px; min-height: 110px;
+            transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
-        .card.SSR { border: 2px solid var(--legend); background: radial-gradient(circle at top right, #332b00, var(--panel)); }
-        .card.F { border: 2px solid var(--danger); background: #2a0e0e; }
+        /* Rank Colors Borders */
+        .card.N { border-color: var(--n-color); }
+        .card.R { border-color: var(--r-color); }
+        .card.SR { border-color: var(--sr-color); background: linear-gradient(135deg, var(--panel), #251025); }
+        .card.SSR { 
+            border: 2px solid var(--ssr-color); 
+            background: radial-gradient(circle at top right, #3a3005, var(--panel)); 
+            box-shadow: 0 0 15px rgba(241,196,15,0.15);
+        }
+        .card.F { 
+            border: 2px solid var(--f-color); 
+            background: repeating-linear-gradient(45deg, #2a0e0e, #2a0e0e 10px, #1a0505 10px, #1a0505 20px); 
+        }
         
-        .c-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;}
-        .c-rank { font-size: 0.75rem; font-weight: 900; padding: 2px 6px; border-radius: 3px; color: #000; background: #aaa; }
-        .c-rank.SSR { background: var(--legend); } .c-rank.F { background: var(--danger); color: #fff; }
+        .c-top { display: flex; justify-content: space-between; align-items: center; }
         
-        .c-name { font-weight: bold; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .c-info { font-size: 0.8rem; color: #aaa; }
-        .c-status { font-size: 0.8rem; color: #777; margin-top: auto; min-height: 1.2em; font-weight: bold; }
+        /* Rank Badges */
+        .c-rank { 
+            font-size: 0.85rem; padding: 3px 8px; border-radius: 5px; color: #fff; 
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.5); box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .c-rank.N { background: var(--n-color); color: #2f3640; }
+        .c-rank.R { background: var(--r-color); }
+        .c-rank.SR { background: var(--sr-color); }
+        .c-rank.SSR { background: var(--ssr-color); color: #000; text-shadow: none; }
+        .c-rank.F { background: var(--f-color); }
         
-        .btn-kick { background: #333; color: #ddd; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; }
-        .btn-kick:active { background: var(--danger); color: #fff; }
+        .c-name { font-weight: bold; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 5px; }
+        .c-info { font-size: 0.8rem; color: #a4b0be; }
+        .c-status { font-size: 0.8rem; color: #ced6e0; margin-top: auto; font-weight: bold; }
+        
+        .btn-kick { 
+            background: rgba(255,255,255,0.1); color: #ccc; border: 1px solid #555; 
+            border-radius: 5px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; font-family: 'Jua', sans-serif;
+        }
+        .btn-kick:active { background: var(--danger); color: white; border-color: var(--danger); }
 
-        /* LOGS SECTION */
+        /* LOGS */
         #section-logs {
-            background: #000; padding: 10px; border: 1px solid var(--border); border-radius: 8px;
-            font-family: 'D2Coding', monospace; font-size: 0.85rem; line-height: 1.6;
-            height: 250px; overflow-y: auto; /* 로그만 따로 스크롤 가능 */
+            background: #000; padding: 12px; border: 1px solid var(--border); border-radius: 10px;
+            font-family: 'D2Coding', 'Consolas', monospace; font-size: 0.85rem; line-height: 1.6;
+            height: 250px; overflow-y: auto; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
         }
-        .log { margin-bottom: 2px; border-bottom: 1px solid #111; padding-bottom: 2px; }
-        .l-get { color: var(--legend); } 
+        .log { margin-bottom: 4px; border-bottom: 1px dashed #222; padding-bottom: 2px; }
+        .l-get { color: var(--ssr-color); } 
         .l-ban { color: var(--danger); } 
-        .l-chat { color: var(--rare); }
-        .l-event { color: var(--epic); font-weight: bold; }
+        .l-chat { color: var(--r-color); }
+        .l-event { color: var(--sr-color); font-weight: bold; }
 
-        /* FOOTER (Floating Button) */
+        /* FOOTER BUTTON */
         footer {
             position: fixed; bottom: 20px; left: 0; width: 100%;
-            display: flex; justify-content: center; pointer-events: none; /* 배경 터치 통과 */
-            z-index: 100;
+            display: flex; justify-content: center; pointer-events: none; z-index: 100;
         }
         #gacha-btn {
-            pointer-events: auto; /* 버튼만 터치 가능 */
-            width: 90%; max-width: 500px; height: 65px;
-            background: linear-gradient(135deg, #e67e22, #d35400);
-            color: white; border: none; border-radius: 15px;
-            font-size: 1.3rem; font-weight: 900; cursor: pointer;
+            pointer-events: auto;
+            width: 90%; max-width: 500px; height: 70px;
+            background: linear-gradient(to bottom, #f39c12, #d35400);
+            color: white; border: none; border-radius: 20px;
+            font-size: 1.5rem; letter-spacing: 1px; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: 0.1s;
-            border: 2px solid #fff;
+            box-shadow: 0 8px 0 #a04000, 0 15px 20px rgba(0,0,0,0.4); 
+            transition: 0.1s; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.2);
         }
-        #gacha-btn:active { transform: scale(0.96); }
-        #gacha-btn:disabled { filter: grayscale(1); opacity: 0.6; transform: scale(1); }
-        .cost-label { font-size: 0.85rem; font-weight: normal; opacity: 0.9; margin-top: 2px;}
+        #gacha-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 #a04000; }
+        #gacha-btn:disabled { filter: grayscale(1); opacity: 0.7; transform: translateY(6px); box-shadow: none; }
+        .cost-label { font-size: 0.9rem; font-weight: normal; opacity: 0.9; margin-top: 2px; font-family: 'Noto Sans KR', sans-serif;}
 
-        /* OVERLAYS */
+        /* EFFECTS */
         .overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000;
             display: none; justify-content: center; align-items: center; flex-direction: column; pointer-events: none;
         }
         .overlay.active { display: flex; animation: fadeIn 0.15s forwards; }
+        
         .pop-card {
-            background: var(--panel); border: 2px solid var(--legend); border-radius: 20px;
-            padding: 40px; text-align: center; transform: scale(0.5); opacity: 0;
-            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            box-shadow: 0 0 50px rgba(255, 165, 2, 0.4); pointer-events: auto;
+            background: #2f3542; border-radius: 20px; padding: 40px; text-align: center; 
+            transform: scale(0.5); opacity: 0; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            box-shadow: 0 0 60px rgba(0,0,0,0.8); pointer-events: auto; min-width: 300px;
         }
+        /* Pop Card Ranks */
+        .pop-card.SSR { border: 4px solid var(--ssr-color); box-shadow: 0 0 60px rgba(241,196,15,0.4); }
+        .pop-card.F { border: 4px solid var(--f-color); }
+        .pop-card.SR { border: 4px solid var(--sr-color); }
+        .pop-card.R { border: 4px solid var(--r-color); }
+        .pop-card.N { border: 4px solid var(--n-color); }
+
+        .pop-rank { font-size: 4rem; margin-bottom: 10px; display: block; text-shadow: 3px 3px 0 rgba(0,0,0,0.3); }
+        .pop-name { font-size: 1.8rem; color: #fff; margin-bottom: 10px; font-family: 'Jua', sans-serif;}
+        .pop-desc { font-size: 1rem; color: #a4b0be; font-family: 'Noto Sans KR', sans-serif; }
+
         .float-txt {
-            position: absolute; font-weight: bold; pointer-events: none; z-index: 100;
+            position: absolute; font-weight: 900; pointer-events: none; z-index: 100;
             text-shadow: 1px 1px 0 #000; animation: floatUp 1s forwards; font-size: 1.1rem;
+            font-family: 'Jua', sans-serif;
         }
+        
         #gameover { pointer-events: auto; background: rgba(0,0,0,0.95); }
 
         @keyframes popIn { to { transform: scale(1); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-50px); } }
     </style>
 </head>
 <body>
@@ -153,7 +204,7 @@
     </header>
 
     <div class="ticker-wrap">
-        <div class="ticker" id="ui-ticker">시스템: 슬롯 확장 및 자동 저장 모듈 가동... 대규모 채용을 시작하세요...</div>
+        <div class="ticker" id="ui-ticker">시스템: 비주얼 업데이트 완료. 파딱 군단을 소환하세요...</div>
     </div>
 
     <main>
@@ -163,43 +214,44 @@
                 <span>터치하여 해고</span>
             </div>
             <div id="slot-grid" class="slot-grid">
-                <div style="grid-column: span 2; text-align:center; padding: 60px 20px; color:#444;">
-                    <div style="font-size:2rem; margin-bottom:10px;">💾</div>
+                <div style="grid-column: span 2; text-align:center; padding: 60px 20px; color:#555;">
+                    <div style="font-size:3rem; margin-bottom:10px;">👻</div>
                     데이터 로드 중...<br>또는 파딱이 없습니다.
                 </div>
             </div>
         </section>
 
         <section>
-            <div style="color:#888; font-size:0.9rem; margin-bottom:5px; font-weight:bold;">활동 로그</div>
+            <div style="color:#7f8fa6; font-size:0.9rem; margin-bottom:5px; font-family:'Jua';">실시간 로그</div>
             <div id="section-logs">
-                <div class="log l-sys">시스템 가동. 저장된 데이터 로드 완료.</div>
+                <div class="log l-sys">시스템 정상 가동.</div>
             </div>
         </section>
     </main>
 
     <footer>
         <button id="gacha-btn" onclick="game.pull()">
-            파딱 소환
+            파딱 소환 !!
             <span id="ui-cost" class="cost-label">100 CP</span>
         </button>
     </footer>
 
     <div id="overlay" class="overlay">
-        <div class="pop-card">
-            <div id="pop-rank" style="font-size:3.5rem; font-weight:900; margin-bottom:10px;">SSR</div>
-            <div id="pop-name" style="font-size:1.5rem; color:#fff; margin-bottom:5px;">전설의 파딱</div>
+        <div id="pop-card" class="pop-card">
+            <div id="pop-rank" class="pop-rank" style="color:var(--ssr-color)">SSR</div>
+            <div id="pop-name" class="pop-name">전설의 파딱</div>
+            <div id="pop-desc" class="pop-desc">특성 설명</div>
         </div>
     </div>
 
     <div id="gameover" class="overlay">
-        <h1 style="color:var(--danger); font-size:3rem; margin-bottom:20px;">GAME OVER</h1>
-        <p style="color:#ccc; margin-bottom:40px;">갤러리가 폭파되었습니다.<br>멘탈이 바닥났습니다.</p>
-        <button onclick="game.hardReset()" style="padding:15px 40px; border-radius:30px; border:none; background:var(--accent); color:#fff; font-weight:bold; font-size:1.2rem; cursor:pointer;">새 지구 파기</button>
+        <h1 style="color:var(--danger); font-size:3.5rem; margin-bottom:20px; font-family:'Jua'">GAME OVER</h1>
+        <p style="color:#ccc; margin-bottom:40px; font-size:1.2rem;">갤러리가 폭파되었습니다.<br>파딱들이 전부 런했습니다.</p>
+        <button onclick="game.hardReset()" style="padding:15px 50px; border-radius:30px; border:none; background:var(--danger); color:#fff; font-weight:bold; font-size:1.3rem; cursor:pointer; font-family:'Jua'">새 지구 파기</button>
     </div>
 
 <script>
-/* ================= DATABASE (V11 Expansion) ================= */
+/* ================= DATABASE ================= */
 const DB = {
     jobs: {
         N: ['눈팅족', '개추봇', '댓글러', '유동', '질문충', '핑프', '복붙러'],
@@ -229,7 +281,7 @@ const DB = {
     }
 };
 
-const SAVE_KEY = "pasdak_save_v11";
+const SAVE_KEY = "pasdak_save_v11_visual";
 
 /* ================= LOGIC ================= */
 class Game {
@@ -250,8 +302,10 @@ class Game {
             logs: document.getElementById('section-logs'),
             btn: document.getElementById('gacha-btn'),
             overlay: document.getElementById('overlay'),
+            popCard: document.getElementById('pop-card'),
             popRank: document.getElementById('pop-rank'),
             popName: document.getElementById('pop-name'),
+            popDesc: document.getElementById('pop-desc'),
             ticker: document.getElementById('ui-ticker')
         };
 
@@ -291,7 +345,7 @@ class Game {
     }
 
     hardReset() {
-        if(confirm("모든 데이터를 삭제하고 처음부터 시작하시겠습니까?")) {
+        if(confirm("정말 초기화 하시겠습니까?")) {
             localStorage.removeItem(SAVE_KEY);
             location.reload();
         }
@@ -441,19 +495,13 @@ class Game {
             this.log(`💨 [${p.name}]이(가) 멘탈이 터져서 탈주했습니다.`, 'l-ban');
             this.kick(p.id);
         }
-        else {
-            const chaosMsg = DB.logs.chaos[Math.floor(Math.random()*DB.logs.chaos.length)];
-            const st = document.getElementById(`st-${p.id}`);
-            if(st) { st.innerText = chaosMsg; st.style.color = "#ff4757"; }
-            if(p.rank === 'F') this.stress += 1;
-        }
     }
 
     renderSlots() {
         this.ui.slots.innerHTML = '';
         if(this.pasdaks.length === 0) {
-            this.ui.slots.innerHTML = `<div style="grid-column: span 2; text-align:center; padding: 60px 20px; color:#444;">
-                <div style="font-size:2rem; margin-bottom:10px;">👻</div>
+            this.ui.slots.innerHTML = `<div style="grid-column: span 2; text-align:center; padding: 60px 20px; color:#444; font-family:'Jua';">
+                <div style="font-size:3rem; margin-bottom:10px;">👻</div>
                 고용된 파딱이 없습니다.<br>하단 버튼으로 노예를 소환하세요.
             </div>`;
             return;
@@ -479,7 +527,7 @@ class Game {
         this.ui.cp.innerText = Math.floor(this.cp);
         this.ui.stress.style.width = Math.min(100, this.stress) + '%';
         this.ui.count.innerText = this.pasdaks.length;
-        this.ui.cost.innerText = this.pasdaks.length >= this.maxSlots ? "SLOT FULL" : `${this.cost} CP`;
+        this.ui.cost.innerText = this.pasdaks.length >= this.maxSlots ? "FULL" : `${this.cost} CP`;
         this.ui.btn.disabled = this.cp < this.cost || this.pasdaks.length >= this.maxSlots;
     }
 
@@ -491,9 +539,12 @@ class Game {
     }
 
     showPop(p) {
+        const color = p.rank=='SSR'?'#f1c40f':(p.rank=='F'?'#c0392b':(p.rank=='SR'?'#9b59b6':(p.rank=='R'?'#3498db':'#95a5a6')));
         this.ui.popRank.innerText = p.rank;
-        this.ui.popRank.style.color = p.rank=='SSR'?'#f1c40f':(p.rank=='F'?'#ff4757':'#fff');
+        this.ui.popRank.style.color = color;
         this.ui.popName.innerText = p.name;
+        this.ui.popDesc.innerText = p.job;
+        this.ui.popCard.className = `pop-card ${p.rank}`;
         
         const ol = this.ui.overlay;
         ol.classList.remove('active'); void ol.offsetWidth; ol.classList.add('active');
