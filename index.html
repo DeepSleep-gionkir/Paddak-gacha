@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>무한 파딱 가챠: COMPLETE</title>
+    <title>무한 파딱 가챠: ALLIANCE</title>
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&family=Jua&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,6 +11,8 @@
             --n: #95a5a6; --r: #3498db; --sr: #9b59b6; --ssr: #f1c40f; --f: #e74c3c; --hidden: #444;
             --text: #f5f6fa; --border: #333;
             --accent: #e67e22; --danger: #eb4d4b; --success: #6ab04c;
+            --coop-bad: #d63031; /* 좆목질 색상 */
+            --coop-good: #00cec9; /* 정의구현 색상 */
         }
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
         
@@ -74,7 +76,6 @@
             position: relative; display: flex; flex-direction: column; gap: 4px; min-height: 110px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s;
         }
-        /* 등급별 색상 */
         .card.Hidden { border: 2px dashed #555; background: #181818; }
         .card.N { border-color: var(--n); }
         .card.R { border-color: var(--r); }
@@ -117,7 +118,10 @@
         .l-ban { color: var(--f); font-weight: bold; } 
         .l-work { color: var(--success); }
         .l-chaos { color: var(--accent); font-weight: bold; }
-        .l-reveal { color: #fff; font-weight: bold; background: #333; padding: 2px 5px; border-radius: 3px;}
+        
+        /* New Styles for Cooperation */
+        .l-coop-bad { color: #d63031; font-weight: 900; border-left: 3px solid #d63031; padding-left: 5px; } /* F급 협동 */
+        .l-coop-good { color: #00cec9; font-weight: 900; border-left: 3px solid #00cec9; padding-left: 5px; } /* 고위직 협동 */
 
         /* FOOTER */
         footer {
@@ -181,7 +185,7 @@
     </header>
 
     <div class="ticker-wrap">
-        <div class="ticker" id="ui-ticker">📢 시스템: '가면 무도회' 모드 활성화. F급 출현 확률 30%... 정체를 알 수 없습니다...</div>
+        <div class="ticker" id="ui-ticker">📢 시스템: 협동(Alliance) 업데이트 완료. F급들의 좆목질을 주의하세요...</div>
     </div>
 
     <main>
@@ -217,7 +221,7 @@
 
     <div id="gameover" class="overlay">
         <h1 style="color:var(--f); font-size:4rem; margin-bottom:20px;">GAME OVER</h1>
-        <p style="color:#ccc; margin-bottom:40px; font-size:1.2rem;">멘탈이 터졌습니다.<br>믿었던 파딱들이 배신했습니다.</p>
+        <p style="color:#ccc; margin-bottom:40px; font-size:1.2rem;">멘탈이 터졌습니다.<br>갤러리가 친목질로 망했습니다.</p>
         <button onclick="window.game.hardReset()" style="padding:15px 50px; border-radius:30px; border:none; background:var(--f); color:#fff; font-weight:bold; font-size:1.3rem; cursor:pointer;">새 지구 파기</button>
     </div>
 
@@ -231,23 +235,14 @@ const DB = {
         F: ['분탕충', '타갤첩자', '좆목대장', '권력남용', '컨셉충', '네임드호소인']
     },
     logs: {
-        work: [ 
-            "야짤 컷", "VPN 차단", "할카스 제거", "주작기 차단", "실베 방어", "매크로 차단",
-            "광고글 삭제", "유입 질문 답변"
-        ],
-        fight: [ 
-            "패드립 시전", "현피 신청", "고닉 고로시", "뒷담화 적발", "통매음 고소", "완장질"
-        ],
-        idle: [ 
-            "자는 중", "라면 먹음", "눈팅 중", "똥 싸는 중", "롤 하는 중", "유튜브 시청"
-        ],
-        chaos: [ 
-            "타갤 침공!", "주작기 가동!", "야짤 달리는 중", "유입 폭주", "횡령 적발", "좆목질 포착"
-        ]
+        work: [ "야짤 컷", "VPN 차단", "할카스 제거", "주작기 차단", "실베 방어", "매크로 차단", "광고글 삭제", "유입 질문 답변" ],
+        fight: [ "패드립 시전", "현피 신청", "고닉 고로시", "뒷담화 적발", "통매음 고소", "완장질" ],
+        idle: [ "자는 중", "라면 먹음", "눈팅 중", "똥 싸는 중", "롤 하는 중", "유튜브 시청" ],
+        chaos: [ "타갤 침공!", "주작기 가동!", "야짤 달리는 중", "유입 폭주", "횡령 적발", "좆목질 포착" ]
     }
 };
 
-const SAVE_KEY = "pasdak_save_v19_complete";
+const SAVE_KEY = "pasdak_save_v20_alliance";
 
 class Game {
     constructor() {
@@ -315,15 +310,10 @@ class Game {
         this.cp -= this.cost;
         this.cost = Math.floor(this.cost * 1.15); 
 
-        // 1. 진짜 등급 결정 (F급 확률 30% 적용)
         const r = Math.random() * 100;
         let realRank = 'N';
         
-        // r < 4 : SSR (4%)
-        // r < 34 : F (30%)
-        // r < 54 : SR (20%)
-        // r < 74 : R (20%)
-        // 나머지 : N (26%)
+        // F급 30% 확률 유지
         if (r < 4) realRank = 'SSR';      
         else if (r < 34) realRank = 'F';  
         else if (r < 54) realRank = 'SR'; 
@@ -333,7 +323,6 @@ class Game {
         const job = jobList[Math.floor(Math.random() * jobList.length)];
         const name = (Math.random()<0.5?'유동':'고닉') + Math.floor(Math.random()*9999);
         
-        // 2. 능력치 설정
         let power = 5; let chaos = 5;
         if(realRank === 'SSR') { power = 50; chaos = 0; }
         else if(realRank === 'SR') { power = 25; chaos = 5; }
@@ -352,11 +341,11 @@ class Game {
             chaos: 5, 
             realChaos: chaos, 
             revealed: false,
-            revealTimer: 10 + Math.floor(Math.random() * 10) // 10~20초 후 공개
+            revealTimer: 10 + Math.floor(Math.random() * 10) 
         };
 
         this.pasdaks.push(p);
-        this.showPop(p); // 팝업에는 ???로 뜸
+        this.showPop(p);
         this.log(`🔰 [채용] ${p.name} 수습 파딱 임명 (심사 중...)`, 'l-sys');
         this.renderSlots();
         this.updateUI();
@@ -384,37 +373,35 @@ class Game {
         const isMentalBreakdown = this.stress >= 80;
 
         this.pasdaks.forEach(p => {
-            // 1. Reveal Logic
             if (!p.revealed) {
                 p.revealTimer--;
-                if (p.revealTimer <= 0) {
-                    this.revealIdentity(p);
-                }
+                if (p.revealTimer <= 0) this.revealIdentity(p);
             }
 
-            // 2. Action Logic
             const roll = Math.random() * 100;
             let currentChaos = p.chaos;
             
-            if (isMentalBreakdown && (p.realRank === 'SSR' || p.realRank === 'SR')) {
-                currentChaos = 50; 
+            if (isMentalBreakdown && (p.realRank === 'SSR' || p.realRank === 'SR')) currentChaos = 50; 
+
+            // 협동 이벤트 체크 (Coop Check)
+            let handled = false;
+            if (p.revealed && Math.random() < 0.05) { // 5% 확률로 협동 시도
+                handled = this.handleCoop(p);
             }
 
-            // Chaos Event
-            if (roll < currentChaos / 4) {
-                this.triggerEvent(p, isMentalBreakdown);
-            } 
-            // Work
-            else {
-                totalGain += p.power;
-                if (Math.random() < 0.15) {
-                    const txt = DB.logs.work[Math.floor(Math.random()*DB.logs.work.length)];
-                    const el = document.getElementById(`st-${p.id}`);
-                    if (el) { el.innerText = txt; el.style.color = "#2ecc71"; }
-                    if (p.power > 0) this.createFloatText(`+${p.power}`, `card-${p.id}`, "#2ecc71");
-                    
-                    if(Math.random() < 0.2) this.log(`✅ [업무] ${p.name}: ${txt}`, 'l-work');
-                } 
+            if (!handled) {
+                if (roll < currentChaos / 4) {
+                    this.triggerEvent(p, isMentalBreakdown);
+                } else {
+                    totalGain += p.power;
+                    if (Math.random() < 0.1) {
+                        const txt = DB.logs.work[Math.floor(Math.random()*DB.logs.work.length)];
+                        const el = document.getElementById(`st-${p.id}`);
+                        if (el) { el.innerText = txt; el.style.color = "#2ecc71"; }
+                        if (p.power > 0) this.createFloatText(`+${p.power}`, `card-${p.id}`, "#2ecc71");
+                        if (Math.random() < 0.2) this.log(`✅ [업무] ${p.name}: ${txt}`, 'l-work');
+                    } 
+                }
             }
         });
 
@@ -446,6 +433,53 @@ class Game {
         this.saveGame(); 
     }
 
+    // New: 협동(좆목/정의) 시스템
+    handleCoop(p) {
+        // F급 좆목질
+        if (p.realRank === 'F') {
+            const partners = this.pasdaks.filter(t => t.id !== p.id && t.realRank === 'F' && t.revealed);
+            if (partners.length > 0) {
+                const partner = partners[Math.floor(Math.random() * partners.length)];
+                const actions = ["비밀 단톡방 개설", "여론 조작 공모", "네임드화 시도", "단체 태업"];
+                const act = actions[Math.floor(Math.random()*actions.length)];
+                this.log(`🤮 [좆목] ${p.name} & ${partner.name}: ${act} 중! (스트레스↑)`, 'l-coop-bad');
+                this.createFloatText("좆목", `card-${p.id}`, "#d63031");
+                this.createFloatText("질", `card-${partner.id}`, "#d63031");
+                this.stress += 5;
+                return true;
+            }
+        }
+        // 고위직 정의구현 (SR, SSR)
+        if (['SR', 'SSR'].includes(p.realRank)) {
+            const partners = this.pasdaks.filter(t => t.id !== p.id && ['SR', 'SSR'].includes(t.realRank) && t.revealed);
+            if (partners.length > 0) {
+                const partner = partners[Math.floor(Math.random() * partners.length)];
+                
+                // 30% 확률로 F급 숙청
+                if (Math.random() < 0.3) {
+                    const fTargets = this.pasdaks.filter(t => t.realRank === 'F' && !t.revealed); // 미공개 F급 색출
+                    if (fTargets.length > 0) {
+                        const target = fTargets[0];
+                        this.log(`⚖️ [숙청] ${p.name} & ${partner.name}: 숨어있던 분탕 ${target.name} 색출 및 처단!`, 'l-coop-good');
+                        this.kick(target.id);
+                        return true;
+                    }
+                }
+                
+                // 일반 정화 활동
+                const actions = ["갤러리 대청소", "대형 프로젝트 가동", "유입 가이드 작성", "분쟁 중재"];
+                const act = actions[Math.floor(Math.random()*actions.length)];
+                this.log(`🤝 [동맹] ${p.name} & ${partner.name}: ${act} (스트레스↓)`, 'l-coop-good');
+                this.createFloatText("정의", `card-${p.id}`, "#00cec9");
+                this.createFloatText("구현", `card-${partner.id}`, "#00cec9");
+                this.stress = Math.max(0, this.stress - 5);
+                this.cp += 50;
+                return true;
+            }
+        }
+        return false;
+    }
+
     revealIdentity(p) {
         p.revealed = true;
         p.displayRank = p.realRank;
@@ -472,11 +506,13 @@ class Game {
              return;
         }
 
+        // F급끼리는 안 싸움 (수정됨)
         if (p.realRank === 'F' && p.revealed && r < 0.3) {
             if(this.pasdaks.length > 1) {
                 const target = this.pasdaks[Math.floor(Math.random()*this.pasdaks.length)];
-                if(target.id !== p.id) {
-                    this.log(`🚨 [팀킬] ${p.name} 👉 ${target.name} 차단!`, 'l-ban');
+                // F급이 아닌 애만 공격
+                if(target.id !== p.id && target.realRank !== 'F') {
+                    this.log(`🚨 [테러] ${p.name} 👉 ${target.name} 무고 밴 시전!`, 'l-ban');
                     this.kick(target.id);
                 }
             }
@@ -485,6 +521,9 @@ class Game {
             if(this.pasdaks.length > 1) {
                 const target = this.pasdaks[Math.floor(Math.random()*this.pasdaks.length)];
                 if(target.id !== p.id) {
+                    // F끼리 싸움 방지
+                    if (p.realRank === 'F' && target.realRank === 'F') return; 
+
                     const fightMsg = DB.logs.fight[Math.floor(Math.random()*DB.logs.fight.length)];
                     this.log(`🥊 [전투] ${p.name} vs ${target.name}: ${fightMsg}`, 'l-ban');
                     const st = document.getElementById(`st-${p.id}`);
