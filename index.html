@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>무한 파딱 가챠: LIVE LOG</title>
+    <title>무한 파딱 가챠: FINAL COLOR</title>
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #050505; --panel: #111;
-            --accent: #ff6b6b; --danger: #ff4757; --success: #2ecc71;
-            --ssr: #ffa502; --text: #f1f2f6; --border: #222;
+            --bg: #0a0a0a; --panel: #141414;
+            /* 등급별 색상 변수 */
+            --n: #95a5a6; 
+            --r: #3498db; 
+            --sr: #9b59b6; 
+            --ssr: #f1c40f; 
+            --f: #e74c3c;
+            --text: #f5f6fa; --border: #333;
         }
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
         
@@ -24,7 +29,7 @@
         /* HEADER */
         header {
             position: sticky; top: 0; z-index: 100;
-            background: rgba(5, 5, 5, 0.95); border-bottom: 1px solid var(--border);
+            background: rgba(10, 10, 10, 0.95); border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center; padding: 12px 15px;
             backdrop-filter: blur(10px);
         }
@@ -35,16 +40,16 @@
             width: 110px; height: 18px; background: #222; border-radius: 4px; 
             overflow: hidden; position: relative; border: 1px solid #444;
         }
-        .stress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff9f43, #ff4757); transition: width 0.2s; }
+        .stress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #e67e22, #e74c3c); transition: width 0.2s; }
         .stress-label { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
             font-size: 10px; color: #fff; text-shadow: 1px 1px 2px #000; letter-spacing: 1px; white-space: nowrap;
         }
         
         .reset-btn {
-            background: #2d3436; color: #aaa; border: 1px solid #444; 
+            background: #2d3436; color: #ccc; border: 1px solid #555; 
             padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; 
-            cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+            cursor: pointer; font-family: 'Noto Sans KR', sans-serif; z-index: 101;
         }
 
         /* TICKER */
@@ -54,7 +59,7 @@
         }
         .ticker {
             white-space: nowrap; animation: ticker 20s linear infinite;
-            padding-left: 100%; color: var(--danger); font-size: 0.9rem; font-family: 'Noto Sans KR'; font-weight: bold;
+            padding-left: 100%; color: var(--f); font-size: 0.9rem; font-family: 'Noto Sans KR'; font-weight: bold;
         }
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
@@ -67,39 +72,32 @@
         }
         .slot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         
+        /* CARD DESIGN (COLOR FIX) */
         .card {
-            background: var(--panel); border: 1px solid #333; border-radius: 6px; padding: 10px;
+            background: var(--panel); border: 1px solid #333; border-radius: 8px; padding: 10px;
             position: relative; display: flex; flex-direction: column; gap: 4px; min-height: 110px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.1s;
         }
+        /* Card Borders based on Rank */
+        .card.N { border-color: var(--n); }
+        .card.R { border-color: var(--r); }
+        .card.SR { border-color: var(--sr); }
         .card.SSR { border: 2px solid var(--ssr); background: radial-gradient(circle at top right, #3a2a05, #111); }
-        .card.F { border: 2px solid var(--danger); background: #220505; }
+        .card.F { border: 2px solid var(--f); background: #220505; }
         
         .c-top { display: flex; justify-content: space-between; align-items: center; }
-        /* ---------------- 수정 시작 ---------------- */
         
+        /* Rank Badges (Background Colors) */
         .c-rank { 
-            font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; 
-            color: #fff; font-weight: bold; 
-            text-shadow: 1px 1px 0 rgba(0,0,0,0.5); /* 글자 잘 보이게 그림자 */
+            font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; color: #fff; 
+            font-weight: bold; text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
         }
-
-        /* 각 등급별 배경색 지정 */
-        .c-rank.N { background: var(--n); color: #dcdcdc; }
+        .c-rank.N { background: var(--n); color: #2d3436; }
         .c-rank.R { background: var(--r); }
         .c-rank.SR { background: var(--sr); }
+        .c-rank.SSR { background: var(--ssr); color: #000; box-shadow: 0 0 8px var(--ssr); text-shadow: none; }
+        .c-rank.F { background: var(--f); }
         
-        /* SSR은 특별하게 (검은 글씨 + 금색 배경 + 빛남) */
-        .c-rank.SSR { 
-            background: var(--ssr); color: #000; 
-            text-shadow: none; 
-            box-shadow: 0 0 10px var(--ssr); 
-        }
-        
-        /* F급은 위험한 색 */
-        .c-rank.F { background: var(--danger); }
-
-        /* ---------------- 수정 끝 ---------------- */        
         .c-name { font-weight: 900; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color:#ddd;}
         .c-info { font-size: 0.75rem; color: #888; }
         .c-status { font-size: 0.75rem; color: #aaa; margin-top: auto; font-weight: bold; min-height: 1.2em;}
@@ -108,20 +106,20 @@
             background: #222; color: #ccc; border: 1px solid #444; 
             border-radius: 4px; padding: 3px 8px; font-size: 0.7rem; cursor: pointer;
         }
-        .btn-fire:active { background: var(--danger); color: #fff; }
+        .btn-fire:active { background: var(--f); color: #fff; }
 
         /* LOG SECTION */
         #section-logs {
             background: #000; padding: 12px; border: 1px solid #333; border-radius: 8px;
-            font-family: 'Noto Sans KR', sans-serif; font-size: 0.9rem; line-height: 1.6;
+            font-family: 'Noto Sans KR', sans-serif; font-size: 0.85rem; line-height: 1.6;
             height: 300px; overflow-y: auto; box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
         }
-        .log { margin-bottom: 6px; border-bottom: 1px dashed #222; padding-bottom: 2px; }
+        .log { margin-bottom: 4px; border-bottom: 1px dashed #222; padding-bottom: 2px; text-shadow: 1px 1px 0 #000; }
         .l-sys { color: #555; font-size: 0.8rem; }
+        .l-get { color: var(--ssr); font-weight: bold; } 
+        .l-ban { color: var(--f); font-weight: bold; } 
         .l-work { color: var(--success); }
-        .l-fight { color: var(--danger); font-weight: bold; }
-        .l-chaos { color: var(--accent); font-weight: bold; }
-        .l-get { color: var(--ssr); }
+        .l-chaos { color: var(--accent); }
 
         /* FOOTER */
         footer {
@@ -131,14 +129,14 @@
         #gacha-btn {
             pointer-events: auto;
             width: 92%; max-width: 500px; height: 70px;
-            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            background: linear-gradient(135deg, #e67e22, #d35400);
             color: white; border: none; border-radius: 12px;
             font-size: 1.6rem; letter-spacing: 2px; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 8px 0 #a3001b, 0 15px 30px rgba(0,0,0,0.5); 
+            box-shadow: 0 8px 0 #a34000, 0 15px 30px rgba(0,0,0,0.5); 
             border: 2px solid rgba(255,255,255,0.2); transition: 0.1s; text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
         }
-        #gacha-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 #a3001b; }
+        #gacha-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 #a34000; }
         #gacha-btn:disabled { filter: grayscale(1); opacity: 0.7; transform: translateY(6px); box-shadow: none; }
         .cost-label { font-size: 0.9rem; font-weight: bold; opacity: 0.9; margin-top: 2px; font-family: 'Noto Sans KR'; }
 
@@ -151,11 +149,12 @@
         .pop-card {
             background: #222; border-radius: 20px; padding: 40px; text-align: center; 
             transform: scale(0.5); opacity: 0; animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            box-shadow: 0 0 80px rgba(255, 165, 2, 0.3); pointer-events: auto; min-width: 300px;
-            border: 4px solid var(--ssr);
+            box-shadow: 0 0 80px rgba(0,0,0,0.5); pointer-events: auto; min-width: 300px;
+            border: 4px solid #fff;
         }
-        .pop-rank { font-size: 4rem; margin-bottom: 10px; color: var(--ssr); text-shadow: 4px 4px 0 #000; }
+        .pop-rank { font-size: 4rem; margin-bottom: 10px; text-shadow: 4px 4px 0 #000; }
         .pop-name { font-size: 1.8rem; color: #fff; margin-bottom: 10px; }
+        .pop-desc { font-size: 1rem; color: #aaa; }
         
         .float-txt {
             position: absolute; font-weight: 900; pointer-events: none; z-index: 100;
@@ -184,7 +183,7 @@
     </header>
 
     <div class="ticker-wrap">
-        <div class="ticker" id="ui-ticker">📢 시스템: 관리 로그 모듈이 활성화되었습니다. 파딱들의 활동이 실시간으로 기록됩니다...</div>
+        <div class="ticker" id="ui-ticker">📢 긴급 속보: 디시인사이드 갤러리 관리자 모집 중... 멘탈을 조심하십시오...</div>
     </div>
 
     <main>
@@ -201,7 +200,7 @@
         </section>
 
         <section>
-            <div style="color:#555; font-size:0.8rem; margin-bottom:5px; font-weight:bold; letter-spacing:1px;">🚨 실시간 관리 로그</div>
+            <div style="color:#555; font-size:0.8rem; margin-bottom:5px; font-weight:bold; letter-spacing:1px;">🚨 실시간 상황실</div>
             <div id="section-logs">
                 <div class="log l-sys">서버 연결 성공. 로그 기록을 시작합니다.</div>
             </div>
@@ -219,14 +218,14 @@
         <div id="pop-card" class="pop-card">
             <div id="pop-rank" class="pop-rank">SSR</div>
             <div id="pop-name" class="pop-name">전설의 파딱</div>
-            <div id="pop-desc" style="color:#aaa; font-size:1rem;">특성 설명</div>
+            <div id="pop-desc" class="pop-desc">특성 설명</div>
         </div>
     </div>
 
     <div id="gameover" class="overlay">
-        <h1 style="color:var(--danger); font-size:4rem; margin-bottom:20px;">GAME OVER</h1>
+        <h1 style="color:var(--f); font-size:4rem; margin-bottom:20px;">GAME OVER</h1>
         <p style="color:#ccc; margin-bottom:40px; font-size:1.2rem;">멘탈이 바사삭 부서졌습니다.<br>갤러리는 망했습니다.</p>
-        <button onclick="window.game.hardReset()" style="padding:15px 50px; border-radius:30px; border:none; background:var(--danger); color:#fff; font-weight:bold; font-size:1.3rem; cursor:pointer;">새 지구 파기</button>
+        <button onclick="window.game.hardReset()" style="padding:15px 50px; border-radius:30px; border:none; background:var(--f); color:#fff; font-weight:bold; font-size:1.3rem; cursor:pointer;">새 지구 파기</button>
     </div>
 
 <script>
@@ -262,7 +261,7 @@ const DB = {
     }
 };
 
-const SAVE_KEY = "pasdak_live_v16";
+const SAVE_KEY = "pasdak_save_v17_final";
 
 class Game {
     constructor() {
@@ -312,7 +311,9 @@ class Game {
                 this.cost = parsed.cost;
                 this.pasdaks = parsed.pasdaks || [];
                 this.log("⚠️ 저장된 데이터를 복구했습니다.", "l-sys");
-            } catch (e) {}
+            } catch (e) {
+                console.error("Save corrupted", e);
+            }
         }
     }
 
@@ -354,7 +355,7 @@ class Game {
 
         this.pasdaks.push(p);
         this.showPop(p);
-        this.log(`✨ [영입] ${p.rank}급 ${p.name} (${p.job}) 등장!`, 'l-get');
+        this.log(`✨ [${rank}] ${p.name} (${p.job}) 영입 성공!`, 'l-get');
         this.renderSlots();
         this.updateUI();
         this.saveGame();
@@ -364,7 +365,7 @@ class Game {
         const idx = this.pasdaks.findIndex(p => p.id === id);
         if(idx > -1) {
             const p = this.pasdaks[idx];
-            this.log(`🚫 [해고] ${p.name} 30일 차단 완료.`, 'l-ban');
+            this.log(`🚫 ${p.name} 해고 완료.`, 'l-ban');
             this.createFloatText("해고", `card-${p.id}`, "#aaa");
             this.pasdaks.splice(idx, 1);
             this.cost = Math.max(100, Math.floor(this.cost * 0.95));
@@ -384,21 +385,16 @@ class Game {
             if (roll < p.chaos / 4) {
                 this.triggerEvent(p);
             } 
-            // 2. Work (Now logs to main console too!)
+            // 2. Work
             else {
                 totalGain += p.power;
                 if (Math.random() < 0.15) {
                     const txt = DB.logs.work[Math.floor(Math.random()*DB.logs.work.length)];
-                    // Update Card UI
                     const el = document.getElementById(`st-${p.id}`);
                     if (el) { el.innerText = txt; el.style.color = "#2ecc71"; }
-                    // Float Text
                     if (p.power > 0) this.createFloatText(`+${p.power}`, `card-${p.id}`, "#2ecc71");
                     
-                    // *** FIX: Log to main console with probability ***
-                    if(Math.random() < 0.3) {
-                        this.log(`✅ [업무] ${p.name}: ${txt}`, 'l-work');
-                    }
+                    if(Math.random() < 0.2) this.log(`✅ ${p.name}: ${txt}`, 'l-work');
                 } 
             }
         });
@@ -430,7 +426,6 @@ class Game {
     triggerEvent(p) {
         const r = Math.random();
         
-        // F Rank: TROLLING
         if (p.rank === 'F' && r < 0.3) {
             if(this.pasdaks.length > 1) {
                 const target = this.pasdaks[Math.floor(Math.random()*this.pasdaks.length)];
@@ -440,25 +435,23 @@ class Game {
                 }
             }
         } 
-        // Fighting
         else if (r < 0.4) { 
             if(this.pasdaks.length > 1) {
                 const target = this.pasdaks[Math.floor(Math.random()*this.pasdaks.length)];
                 if(target.id !== p.id) {
                     const fightMsg = DB.logs.fight[Math.floor(Math.random()*DB.logs.fight.length)];
-                    this.log(`🥊 [전투] ${p.name} vs ${target.name}: ${fightMsg}`, 'l-fight');
+                    this.log(`🥊 ${p.name} vs ${target.name}: ${fightMsg}`, 'l-ban');
                     const st = document.getElementById(`st-${p.id}`);
                     if(st) { st.innerText = "🤬 키배 중"; st.style.color = "#ff4757"; }
                     this.stress += 3;
                 }
             }
         }
-        // Chaos
         else {
             const chaosMsg = DB.logs.chaos[Math.floor(Math.random()*DB.logs.chaos.length)];
             const st = document.getElementById(`st-${p.id}`);
             if(st) { st.innerText = chaosMsg; st.style.color = "#ff6b6b"; }
-            this.log(`⚠️ [사고] ${p.name}: ${chaosMsg}`, 'l-chaos');
+            this.log(`⚠️ ${p.name}: ${chaosMsg}`, 'l-chaos');
             this.stress += 2;
         }
     }
@@ -502,7 +495,7 @@ class Game {
     }
 
     showPop(p) {
-        const cols = {SSR:'#ffa502', SR:'#a55eea', R:'#1e90ff', N:'#747d8c', F:'#ff4757'};
+        const cols = {SSR:'#f1c40f', SR:'#9b59b6', R:'#3498db', N:'#95a5a6', F:'#e74c3c'};
         this.ui.popRank.innerText = p.rank;
         this.ui.popRank.style.color = cols[p.rank];
         this.ui.popName.innerText = p.name;
