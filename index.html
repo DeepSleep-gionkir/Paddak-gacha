@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>무한 파딱: EVOLUTION</title>
+    <title>무한 파딱: HARDCORE BALANCE</title>
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&family=Jua&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -20,7 +20,7 @@
         body {
             margin: 0; padding: 0; background: var(--bg); color: var(--text);
             font-family: 'Noto Sans KR', sans-serif;
-            min-height: 100vh; overflow-y: auto; padding-bottom: 220px; /* 하단 공간 확장 */
+            min-height: 100vh; overflow-y: auto; padding-bottom: 220px;
         }
         
         h1, .pop-rank, .c-rank, .font-title, .res-group, .slot-header { font-family: 'Black Han Sans', sans-serif; }
@@ -174,21 +174,24 @@
             display: flex; flex-direction: column; gap: 8px;
         }
         
-        .utility-bar {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-        }
+        .utility-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .util-btn {
             height: 40px; border: none; border-radius: 8px; color: #fff; cursor: pointer;
             font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 5px;
-            box-shadow: 0 3px 0 rgba(0,0,0,0.4); transition: 0.1s;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.4); transition: 0.1s; position: relative; overflow: hidden;
         }
         .util-btn:active { transform: translateY(3px); box-shadow: none; }
+        .util-btn:disabled { filter: grayscale(1); opacity: 0.5; pointer-events: none; }
+        
         .btn-pizza { background: #e17055; }
         .btn-fever { background: #d63031; animation: pulse 1s infinite; }
         
-        .gacha-bar {
-            display: grid; grid-template-columns: 1fr 1.3fr; gap: 10px;
+        .cooldown-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.5);
+            height: 0%; transition: height 0.1s linear;
         }
+
+        .gacha-bar { display: grid; grid-template-columns: 1fr 1.3fr; gap: 10px; }
         .btn-gacha {
             height: 60px; border: none; border-radius: 12px; color: #fff; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -204,7 +207,7 @@
         .btn-gacha-text { font-size: 1.2rem; }
         .cost-label { font-size: 0.8rem; font-weight: bold; opacity: 0.9; font-family: 'Noto Sans KR'; }
 
-        /* POPUP */
+        /* OVERLAYS */
         .overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000;
             display: none; justify-content: center; align-items: center; flex-direction: column; pointer-events: none;
@@ -249,12 +252,12 @@
     </header>
 
     <div class="ticker-wrap">
-        <div class="ticker" id="ui-ticker">📢 시스템: 영혼 융합 및 협동(Alliance) 업데이트 완료. 좆목질과 키메라를 주의하세요...</div>
+        <div class="ticker" id="ui-ticker">📢 시스템: 긴급 밸런스 패치 적용. 피자 쿨타임 증가, 실베 타임 리스크 강화, 융합 실패율 급증.</div>
     </div>
 
     <div class="altar-area">
         <div class="altar-title">
-            <span>🔮 영혼 융합 (세탁기)</span>
+            <span>🔮 영혼 융합 (도박장)</span>
             <span style="font-size:0.7rem; color:#888;">2명 선택하여 진화</span>
         </div>
         <div class="altar-slots">
@@ -263,7 +266,7 @@
             <div id="slot-2" class="altar-slot">선택2</div>
         </div>
         <button id="btn-fuse" class="btn-fuse" onclick="game.fuse()" disabled>
-            융합 시작 (300 CP)
+            융합 시도 (기본 F확률 30%~)
         </button>
     </div>
 
@@ -286,8 +289,11 @@
 
     <footer>
         <div class="utility-bar">
-            <button class="util-btn btn-pizza" onclick="game.buyPizza()">🍕 피자 돌리기 (500)</button>
-            <button class="util-btn btn-fever" onclick="game.triggerFever()">🔥 실베 보내기 (위험)</button>
+            <button id="btn-pizza" class="util-btn btn-pizza" onclick="game.buyPizza()">
+                🍕 피자 (1000)
+                <div id="cd-pizza" class="cooldown-overlay"></div>
+            </button>
+            <button class="util-btn btn-fever" onclick="game.triggerFever()">🔥 실베 (경고)</button>
         </div>
         <div class="gacha-bar">
             <button id="btn-norm" class="btn-gacha" onclick="game.pull('normal')">
@@ -341,7 +347,7 @@ const DB = {
     power: { N:2, R:6, SR:15, SSR:40, UR:100, F:-15 }
 };
 
-const SAVE_KEY = "pasdak_v31_evo";
+const SAVE_KEY = "pasdak_v40_hardcore";
 
 class Game {
     constructor() {
@@ -355,7 +361,8 @@ class Game {
         this.costNorm = 100;
         this.costPrem = 1000;
         
-        this.feverTimer = 0; // 실베 타임 타이머
+        this.feverTimer = 0;
+        this.pizzaCooldown = 0; // 피자 쿨타임 (초)
 
         this.ui = {
             cp: document.getElementById('ui-cp'),
@@ -373,7 +380,9 @@ class Game {
             slot2: document.getElementById('slot-2'),
             btnFuse: document.getElementById('btn-fuse'),
             btnNorm: document.getElementById('btn-norm'),
-            btnPrem: document.getElementById('btn-prem')
+            btnPrem: document.getElementById('btn-prem'),
+            btnPizza: document.getElementById('btn-pizza'),
+            cdPizza: document.getElementById('cd-pizza')
         };
 
         if(localStorage.getItem(SAVE_KEY)) this.loadGame();
@@ -409,26 +418,28 @@ class Game {
         }
     }
 
-    // --- Utility Functions ---
     buyPizza() {
-        if(this.cp < 500) { alert("CP가 부족합니다."); return; }
+        if(this.feverTimer > 0) { alert("🔥 실베 타임(비상사태) 중에는 여유롭게 피자를 돌릴 수 없습니다!"); return; }
+        if(this.pizzaCooldown > 0) { alert("쿨타임 중입니다!"); return; }
+        if(this.cp < 1000) { alert("CP가 부족합니다 (비용: 1000)."); return; }
         if(this.stress <= 0) { alert("이미 민심이 좋습니다."); return; }
-        this.cp -= 500;
+        
+        this.cp -= 1000;
         this.stress = Math.max(0, this.stress - 20);
-        this.log("🍕 [피자] 도미노 피자 5판을 돌렸습니다. 민심 회복 완료.", "l-work");
+        this.pizzaCooldown = 5; // 5초 쿨타임
+        this.log("🍕 [피자] 피자를 돌려 민심을 잠재웠습니다.", "l-work");
         this.updateUI();
     }
 
     triggerFever() {
         if(this.feverTimer > 0) return;
-        if(confirm("실시간 베스트(실베)로 글을 보냅니다.\n수익이 3배가 되지만, 스트레스가 급증합니다. 진행합니까?")) {
-            this.feverTimer = 15; // 15초 지속
+        if(confirm("실시간 베스트(실베)로 글을 보냅니다.\n수익이 3배가 되지만, 스트레스가 폭증하며 피자를 돌릴 수 없습니다.")) {
+            this.feverTimer = 15;
             this.log("🔥 [실베] 갤러리가 실시간 베스트에 노출되었습니다! 유입 폭주!", "l-chaos");
             document.body.style.animation = "shake 0.5s infinite";
         }
     }
 
-    // --- Core Game Logic ---
     pull(type) {
         if(this.isOver) return;
         let cost = type === 'premium' ? this.costPrem : this.costNorm;
@@ -479,7 +490,7 @@ class Game {
             revealed: false,
             revealTimer: type==='premium' ? 3 : 8,
             lv: 1, exp: 0,
-            trait: null // 특성 없음
+            trait: null
         };
 
         this.pasdaks.push(p);
@@ -512,7 +523,6 @@ class Game {
         this.ui.btnFuse.disabled = this.selected.length !== 2 || this.cp < 300;
     }
 
-    // --- 융합 시스템 개편 (Evolution) ---
     fuse() {
         if(this.selected.length !== 2 || this.cp < 300) return;
         this.cp -= 300;
@@ -520,54 +530,53 @@ class Game {
         const p1 = this.pasdaks.find(p => p.id === this.selected[0]);
         const p2 = this.pasdaks.find(p => p.id === this.selected[1]);
         
-        // 재료 삭제
         this.pasdaks = this.pasdaks.filter(p => !this.selected.includes(p.id));
         this.selected = [];
 
-        // 랭크 계산
-        const ranks = ['N', 'R', 'SR', 'SSR', 'UR', 'F'];
+        const ranks = ['N', 'R', 'SR', 'SSR', 'UR']; 
+        const p1R = p1.realRank;
+        const p2R = p2.realRank;
         let newRank = 'N';
 
-        // 1. 동급 융합 (승급 로직)
-        if (p1.realRank === p2.realRank && p1.realRank !== 'UR') {
-            const idx = ranks.indexOf(p1.realRank);
+        if(p1R === 'F' || p2R === 'F') {
+            if(p1R === 'F' && p2R === 'F') {
+                if(Math.random() < 0.01) { newRank = 'UR'; this.log(`😱 [대사건] 심연의 분탕들이 [UR]로 각성했습니다!`, 'l-chaos'); } 
+                else newRank = 'F';
+            } else {
+                newRank = Math.random() < 0.5 ? 'F' : (p1R==='F' ? p2R : p1R);
+            }
+        }
+        else {
+            const idx1 = ranks.indexOf(p1R);
+            const idx2 = ranks.indexOf(p2R);
+            const diff = Math.abs(idx1 - idx2);
             
-            // F+F 히든 조합 (1% 각성)
-            if(p1.realRank === 'F') {
-                if(Math.random() < 0.01) {
-                    newRank = 'UR';
-                    this.log(`😱 [대사건] 심연의 분탕들이 융합하여 [UR]로 각성했습니다!!!`, 'l-chaos');
-                } else {
-                    newRank = 'F'; // 99% 확률로 그냥 F
+            // 난이도 상향: 기본 30% + (차이 * 10%)
+            const failChance = 0.30 + (diff * 0.10);
+
+            if(Math.random() < failChance) {
+                newRank = 'F';
+            } else {
+                if (diff === 0) {
+                    // 동일 등급: 40% 승급
+                    if (idx1 < 4 && Math.random() < 0.4) newRank = ranks[idx1 + 1];
+                    else newRank = ranks[idx1];
+                } 
+                else if (diff === 1) {
+                    // 인접 등급: 20% 대박 승급
+                    const high = Math.max(idx1, idx2);
+                    if(high < 4 && Math.random() < 0.2) newRank = ranks[high + 1];
+                    else newRank = ranks[high];
                 }
-            } 
-            else {
-                // 일반 승급 (70% 성공, 30% 유지)
-                if (Math.random() < 0.7 && idx < 4) { // UR 전까지만
-                    newRank = ranks[idx + 1];
-                } else {
-                    newRank = p1.realRank;
+                else {
+                    const avg = Math.floor((idx1 + idx2) / 2);
+                    newRank = ranks[avg];
                 }
             }
-        } 
-        // 2. 이종 융합 (평균 회귀)
-        else {
-            const scoreMap = {N:1, R:2, SR:3, SSR:4, UR:5, F:0};
-            const s1 = scoreMap[p1.revealed ? p1.realRank : 'N'];
-            const s2 = scoreMap[p2.revealed ? p2.realRank : 'N'];
-            const avg = (s1 + s2) / 2;
-            
-            if (Math.random() < 0.1) newRank = 'F'; // 10% 융합 실패
-            else if (avg >= 4) newRank = 'UR';
-            else if (avg >= 3.5) newRank = 'SSR';
-            else if (avg >= 2.5) newRank = 'SR';
-            else if (avg >= 1.5) newRank = 'R';
-            else newRank = 'N';
         }
 
-        // 특성 부여 (20% 확률)
         let newTrait = null;
-        if(Math.random() < 0.3) {
+        if(Math.random() < 0.2) {
             newTrait = DB.traits[Math.floor(Math.random() * DB.traits.length)];
         }
 
@@ -607,9 +616,8 @@ class Game {
         const idx = this.pasdaks.findIndex(p => p.id === id);
         if(idx > -1) {
             const p = this.pasdaks[idx];
-            
             let stressReduc = 2;
-            if(p.trait && p.trait.id === 'tank') stressReduc = 5; // 멘탈갑 특성
+            if(p.trait && p.trait.id === 'tank') stressReduc = 5;
 
             this.log(`🚫 [해고] ${p.name} (${p.revealed ? p.realRank : '???'}) 방출됨.`, 'l-ban');
             this.createFloatText("해고", `card-${p.id}`, "#aaa");
@@ -631,10 +639,19 @@ class Game {
         let totalGain = 0;
         const isMentalBreakdown = this.stress >= 80;
         
-        // 피버 타임 처리
+        // 피자 쿨타임
+        if(this.pizzaCooldown > 0) {
+            this.pizzaCooldown--;
+            const pct = (this.pizzaCooldown / 5) * 100;
+            this.ui.cdPizza.style.height = pct + '%';
+        } else {
+            this.ui.cdPizza.style.height = '0%';
+        }
+
+        // 실베 타임 (너프됨)
         if(this.feverTimer > 0) {
             this.feverTimer--;
-            this.stress += 1.5; // 피버 중 스트레스 급증
+            this.stress += 3.0; // 스트레스 폭증
             if(this.feverTimer <= 0) {
                 document.body.style.animation = "none";
                 this.log("💤 [실베] 실베 타임 종료. 갤러리가 진정되었습니다.", "l-sys");
@@ -647,21 +664,18 @@ class Game {
                 if (p.revealTimer <= 0) this.revealIdentity(p);
             }
 
-            // 성장
             p.exp++;
             if(p.exp >= p.lv * 20) {
                 p.lv++; p.exp = 0;
                 if(Math.random() < 0.2) this.createFloatText("Lv UP!", `card-${p.id}`, "#2ecc71");
             }
 
-            // 생산력 계산 (특성 반영)
             let currentPower = p.realPower + (p.lv * 2); 
             if(p.realRank === 'F') currentPower = -15; 
             
             if(p.trait && p.trait.id === 'workaholic') currentPower = Math.floor(currentPower * 1.5);
-            if(this.feverTimer > 0 && currentPower > 0) currentPower *= 3; // 피버 3배
+            if(this.feverTimer > 0 && currentPower > 0) currentPower *= 3;
 
-            // 행동 로직
             const roll = Math.random() * 100;
             let currentChaos = p.chaos;
             if (isMentalBreakdown && ['SSR','SR'].includes(p.realRank)) currentChaos = 50; 
@@ -675,7 +689,7 @@ class Game {
                     this.triggerEvent(p, isMentalBreakdown);
                 } else {
                     totalGain += currentPower;
-                    if (Math.random() < (p.trait?.id==='troll'?0.15:0.05)) { // 관종 특성은 로그 자주
+                    if (Math.random() < (p.trait?.id==='troll'?0.15:0.05)) {
                         const type = currentPower > 0 ? 'work' : 'idle';
                         const txt = DB.logs[type][Math.floor(Math.random()*DB.logs[type].length)];
                         const el = document.getElementById(`st-${p.id}`);
@@ -690,7 +704,6 @@ class Game {
 
         this.cp += totalGain;
         
-        // 스트레스 계산
         const fCount = this.pasdaks.filter(p => p.realRank === 'F' && p.revealed).length;
         let stressInc = fCount * 0.4; 
         if (totalGain < 0) stressInc += 0.5;
@@ -708,7 +721,7 @@ class Game {
              this.ui.ticker.innerText = "🚨 경고: 멘탈 붕괴! 파딱들이 미쳐 날뛰고 있습니다! 🚨";
              this.ui.ticker.style.color = "red";
         } else if (this.feverTimer > 0) {
-             this.ui.ticker.innerText = `🔥 실베 점령 중! 수익 3배! (남은 시간: ${this.feverTimer}초)`;
+             this.ui.ticker.innerText = `🔥 실베 점령 중! (피자 불가 / 스트레스 급증!)`;
              this.ui.ticker.style.color = "#ff7675";
         } else if(Math.random() < 0.02) {
             const msgs = ["야갤 침공 경보", "서버 불안정", "알바가 혐짤 삭제", "실베 등극", "유입 폭주 중"];
@@ -836,6 +849,7 @@ class Game {
         
         this.ui.btnNorm.disabled = this.cp < this.costNorm || this.pasdaks.length >= this.maxSlots;
         this.ui.btnPrem.disabled = this.cp < this.costPrem || this.pasdaks.length >= this.maxSlots;
+        this.ui.btnPizza.disabled = this.cp < 1000 || this.pizzaCooldown > 0 || this.feverTimer > 0; // 버튼 활성화 조건 갱신
     }
 
     log(msg, cls) {
