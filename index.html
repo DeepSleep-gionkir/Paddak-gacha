@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>무한 파딱 가챠: MASQUERADE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>무한 파딱 가챠: COMPLETE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&family=Jua&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0a0a0a; --panel: #141414;
-            --n: #95a5a6; --r: #3498db; --sr: #9b59b6; --ssr: #f1c40f; --f: #e74c3c; --hidden: #555;
+            --n: #95a5a6; --r: #3498db; --sr: #9b59b6; --ssr: #f1c40f; --f: #e74c3c; --hidden: #444;
             --text: #f5f6fa; --border: #333;
             --accent: #e67e22; --danger: #eb4d4b; --success: #6ab04c;
         }
@@ -19,6 +19,7 @@
             font-family: 'Noto Sans KR', sans-serif;
             min-height: 100vh; overflow-y: auto; padding-bottom: 140px;
         }
+        
         h1, .pop-rank, .c-rank, #gacha-btn, .res-group { font-family: 'Black Han Sans', sans-serif; }
 
         /* HEADER */
@@ -53,7 +54,7 @@
             overflow: hidden; display: flex; align-items: center; height: 32px;
         }
         .ticker {
-            white-space: nowrap; animation: ticker 20s linear infinite;
+            white-space: nowrap; animation: ticker 25s linear infinite;
             padding-left: 100%; color: var(--danger); font-size: 0.9rem; font-family: 'Noto Sans KR'; font-weight: bold;
         }
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
@@ -73,7 +74,8 @@
             position: relative; display: flex; flex-direction: column; gap: 4px; min-height: 110px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s;
         }
-        .card.Hidden { border: 2px dashed #555; background: #1a1a1a; } /* 미공개 */
+        /* 등급별 색상 */
+        .card.Hidden { border: 2px dashed #555; background: #181818; }
         .card.N { border-color: var(--n); }
         .card.R { border-color: var(--r); }
         .card.SR { border-color: var(--sr); }
@@ -86,7 +88,7 @@
             font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; color: #fff; 
             font-weight: bold; text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
         }
-        .c-rank.Hidden { background: #555; color: #aaa; }
+        .c-rank.Hidden { background: var(--hidden); color: #aaa; }
         .c-rank.N { background: var(--n); color: #2d3436; }
         .c-rank.R { background: var(--r); }
         .c-rank.SR { background: var(--sr); }
@@ -106,7 +108,7 @@
         /* LOGS */
         #section-logs {
             background: #000; padding: 12px; border: 1px solid #333; border-radius: 8px;
-            font-family: 'Noto Sans KR', sans-serif; font-size: 0.85rem; line-height: 1.6;
+            font-family: 'Noto Sans KR', sans-serif; font-size: 0.9rem; line-height: 1.6;
             height: 300px; overflow-y: auto; box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
         }
         .log { margin-bottom: 4px; border-bottom: 1px dashed #222; padding-bottom: 2px; text-shadow: 1px 1px 0 #000; }
@@ -114,7 +116,7 @@
         .l-get { color: var(--ssr); font-weight: bold; } 
         .l-ban { color: var(--f); font-weight: bold; } 
         .l-work { color: var(--success); }
-        .l-chaos { color: var(--accent); }
+        .l-chaos { color: var(--accent); font-weight: bold; }
         .l-reveal { color: #fff; font-weight: bold; background: #333; padding: 2px 5px; border-radius: 3px;}
 
         /* FOOTER */
@@ -179,7 +181,7 @@
     </header>
 
     <div class="ticker-wrap">
-        <div class="ticker" id="ui-ticker">📢 시스템: '수습 파딱' 제도가 도입되었습니다. 채용 후 일정 기간 동안 정체가 숨겨집니다...</div>
+        <div class="ticker" id="ui-ticker">📢 시스템: '가면 무도회' 모드 활성화. F급 출현 확률 30%... 정체를 알 수 없습니다...</div>
     </div>
 
     <main>
@@ -230,7 +232,8 @@ const DB = {
     },
     logs: {
         work: [ 
-            "야짤 컷", "VPN 차단", "할카스 제거", "주작기 차단", "실베 방어", "매크로 차단"
+            "야짤 컷", "VPN 차단", "할카스 제거", "주작기 차단", "실베 방어", "매크로 차단",
+            "광고글 삭제", "유입 질문 답변"
         ],
         fight: [ 
             "패드립 시전", "현피 신청", "고닉 고로시", "뒷담화 적발", "통매음 고소", "완장질"
@@ -244,7 +247,7 @@ const DB = {
     }
 };
 
-const SAVE_KEY = "pasdak_save_v18_hidden";
+const SAVE_KEY = "pasdak_save_v19_complete";
 
 class Game {
     constructor() {
@@ -312,24 +315,20 @@ class Game {
         this.cp -= this.cost;
         this.cost = Math.floor(this.cost * 1.15); 
 
-        // 1. 진짜 등급 결정
+        // 1. 진짜 등급 결정 (F급 확률 30% 적용)
         const r = Math.random() * 100;
-        if (r < 4) {
-            realRank = 'SSR';      // [4%] SSR 등급
-        } 
-        else if (r < 34) {         
-            // ★ F급 확률 조정: 4 ~ 34 (정확히 30% 확률) ★
-            realRank = 'F';        
-        } 
-        else if (r < 54) {
-            realRank = 'SR';       // [20%] SR 등급
-        } 
-        else if (r < 74) {
-            realRank = 'R';        // [20%] R 등급
-        } 
-        else {
-            realRank = 'N';        // [26%] N 등급
-        }
+        let realRank = 'N';
+        
+        // r < 4 : SSR (4%)
+        // r < 34 : F (30%)
+        // r < 54 : SR (20%)
+        // r < 74 : R (20%)
+        // 나머지 : N (26%)
+        if (r < 4) realRank = 'SSR';      
+        else if (r < 34) realRank = 'F';  
+        else if (r < 54) realRank = 'SR'; 
+        else if (r < 74) realRank = 'R';  
+
         const jobList = DB.jobs[realRank];
         const job = jobList[Math.floor(Math.random() * jobList.length)];
         const name = (Math.random()<0.5?'유동':'고닉') + Math.floor(Math.random()*9999);
@@ -343,15 +342,15 @@ class Game {
 
         const p = { 
             id: Math.random().toString(36).substr(2,9), 
-            realRank: realRank, // 진짜 등급
-            displayRank: '???', // 보여지는 등급
+            realRank: realRank, 
+            displayRank: '???', 
             name: name, 
-            job: '수습 완장', // 보여지는 직업
-            realJob: job, // 진짜 직업
-            power: 5, // 수습 기간 동안은 평범함
-            realPower: power, // 진짜 파워
-            chaos: 5, // 수습 기간엔 얌전함
-            realChaos: chaos, // 진짜 깽판력
+            job: '수습 완장', 
+            realJob: job, 
+            power: 5, 
+            realPower: power, 
+            chaos: 5, 
+            realChaos: chaos, 
             revealed: false,
             revealTimer: 10 + Math.floor(Math.random() * 10) // 10~20초 후 공개
         };
@@ -382,8 +381,6 @@ class Game {
         if(this.isOver) return;
 
         let totalGain = 0;
-        
-        // 멘탈 붕괴 체크 (80% 이상이면 SSR도 미쳐 날뜀)
         const isMentalBreakdown = this.stress >= 80;
 
         this.pasdaks.forEach(p => {
@@ -399,7 +396,6 @@ class Game {
             const roll = Math.random() * 100;
             let currentChaos = p.chaos;
             
-            // 멘탈 붕괴 시, 고등급 파딱도 카오스 확률 급증 (배신)
             if (isMentalBreakdown && (p.realRank === 'SSR' || p.realRank === 'SR')) {
                 currentChaos = 50; 
             }
@@ -411,19 +407,19 @@ class Game {
             // Work
             else {
                 totalGain += p.power;
-                if (Math.random() < 0.1) {
+                if (Math.random() < 0.15) {
                     const txt = DB.logs.work[Math.floor(Math.random()*DB.logs.work.length)];
                     const el = document.getElementById(`st-${p.id}`);
                     if (el) { el.innerText = txt; el.style.color = "#2ecc71"; }
                     if (p.power > 0) this.createFloatText(`+${p.power}`, `card-${p.id}`, "#2ecc71");
+                    
+                    if(Math.random() < 0.2) this.log(`✅ [업무] ${p.name}: ${txt}`, 'l-work');
                 } 
             }
         });
 
         this.cp += totalGain;
         
-        // Stress Calc
-        // F급이거나, 멘탈 붕괴 상태면 스트레스 가속
         const fCount = this.pasdaks.filter(p => p.realRank === 'F' && p.revealed).length;
         let stressInc = fCount * 0.4; 
         if (totalGain < 0) stressInc += 0.5;
@@ -437,7 +433,6 @@ class Game {
             document.getElementById('gameover').style.display = 'flex';
         }
 
-        // Ticker
         if(isMentalBreakdown) {
              this.ui.ticker.innerText = "🚨 경고: 멘탈 붕괴! 파딱들이 미쳐 날뛰고 있습니다! 🚨";
              this.ui.ticker.style.color = "red";
@@ -458,7 +453,6 @@ class Game {
         p.power = p.realPower;
         p.chaos = p.realChaos;
         
-        // Re-render specifically this card or all
         this.renderSlots();
         
         let msgType = 'l-sys';
@@ -472,14 +466,12 @@ class Game {
     triggerEvent(p, isMentalBreak) {
         const r = Math.random();
         
-        // Mental Break Betrayal (SSR/SR going crazy)
         if (isMentalBreak && (p.realRank === 'SSR' || p.realRank === 'SR')) {
              this.log(`😱 [멘탈붕괴] 믿었던 ${p.name}(${p.realRank})이 흑화하여 분탕을 칩니다!`, 'l-ban');
              this.stress += 5;
              return;
         }
 
-        // F Rank: TROLLING
         if (p.realRank === 'F' && p.revealed && r < 0.3) {
             if(this.pasdaks.length > 1) {
                 const target = this.pasdaks[Math.floor(Math.random()*this.pasdaks.length)];
@@ -489,20 +481,18 @@ class Game {
                 }
             }
         } 
-        // Fighting
         else if (r < 0.4) { 
             if(this.pasdaks.length > 1) {
                 const target = this.pasdaks[Math.floor(Math.random()*this.pasdaks.length)];
                 if(target.id !== p.id) {
                     const fightMsg = DB.logs.fight[Math.floor(Math.random()*DB.logs.fight.length)];
-                    this.log(`🥊 ${p.name} vs ${target.name}: ${fightMsg}`, 'l-ban');
+                    this.log(`🥊 [전투] ${p.name} vs ${target.name}: ${fightMsg}`, 'l-ban');
                     const st = document.getElementById(`st-${p.id}`);
                     if(st) { st.innerText = "🤬 키배 중"; st.style.color = "#ff4757"; }
                     this.stress += 3;
                 }
             }
         }
-        // Chaos
         else {
             const chaosMsg = DB.logs.chaos[Math.floor(Math.random()*DB.logs.chaos.length)];
             const st = document.getElementById(`st-${p.id}`);
@@ -520,7 +510,6 @@ class Game {
         }
         this.pasdaks.forEach(p => {
             const d = document.createElement('div');
-            // 정체 공개 여부에 따라 클래스 적용
             const rankClass = p.revealed ? p.realRank : 'Hidden';
             d.className = `card ${rankClass}`;
             d.id = `card-${p.id}`;
@@ -553,7 +542,6 @@ class Game {
     }
 
     showPop(p) {
-        // 뽑기 직후에는 무조건 ???로 표시
         this.ui.popRank.innerText = "???";
         this.ui.popRank.style.color = "#fff";
         this.ui.popName.innerText = p.name;
