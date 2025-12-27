@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>무한 파딱: HARDCORE BALANCE</title>
+    <title>무한 파딱: ECONOMY UPDATE</title>
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&family=Jua&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -177,7 +177,7 @@
         .utility-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .util-btn {
             height: 40px; border: none; border-radius: 8px; color: #fff; cursor: pointer;
-            font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 5px;
+            font-size: 0.95rem; display: flex; flex-direction:column; align-items: center; justify-content: center;
             box-shadow: 0 3px 0 rgba(0,0,0,0.4); transition: 0.1s; position: relative; overflow: hidden;
         }
         .util-btn:active { transform: translateY(3px); box-shadow: none; }
@@ -188,8 +188,10 @@
         
         .cooldown-overlay {
             position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.5);
-            height: 0%; transition: height 0.1s linear;
+            height: 0%; transition: height 0.1s linear; pointer-events: none;
         }
+        
+        .util-cost { font-size: 0.75rem; opacity: 0.9; font-family: 'Noto Sans KR'; margin-top: 2px;}
 
         .gacha-bar { display: grid; grid-template-columns: 1fr 1.3fr; gap: 10px; }
         .btn-gacha {
@@ -252,7 +254,7 @@
     </header>
 
     <div class="ticker-wrap">
-        <div class="ticker" id="ui-ticker">📢 시스템: 긴급 밸런스 패치 적용. 피자 쿨타임 증가, 실베 타임 리스크 강화, 융합 실패율 급증.</div>
+        <div class="ticker" id="ui-ticker">📢 시스템: 물가 상승(Inflation) 업데이트. 피자 값과 실베 알바비가 계속 오릅니다.</div>
     </div>
 
     <div class="altar-area">
@@ -290,10 +292,14 @@
     <footer>
         <div class="utility-bar">
             <button id="btn-pizza" class="util-btn btn-pizza" onclick="game.buyPizza()">
-                🍕 피자 (1000)
+                <div>🍕 피자 돌리기</div>
+                <div id="cost-pizza" class="util-cost">500 CP</div>
                 <div id="cd-pizza" class="cooldown-overlay"></div>
             </button>
-            <button class="util-btn btn-fever" onclick="game.triggerFever()">🔥 실베 (경고)</button>
+            <button id="btn-fever" class="util-btn btn-fever" onclick="game.triggerFever()">
+                <div>🔥 실베 (위험)</div>
+                <div id="cost-fever" class="util-cost">3000 CP</div>
+            </button>
         </div>
         <div class="gacha-bar">
             <button id="btn-norm" class="btn-gacha" onclick="game.pull('normal')">
@@ -301,7 +307,7 @@
                 <span id="cost-norm" class="cost-label">100 CP</span>
             </button>
             <button id="btn-prem" class="btn-gacha" onclick="game.pull('premium')">
-                <span class="btn-gacha-text">🔥 고급 인력</span>
+                <span class="btn-gacha-text">🔥 고급</span>
                 <span id="cost-prem" class="cost-label">1000 CP</span>
             </button>
         </div>
@@ -347,7 +353,7 @@ const DB = {
     power: { N:2, R:6, SR:15, SSR:40, UR:100, F:-15 }
 };
 
-const SAVE_KEY = "pasdak_v40_hardcore";
+const SAVE_KEY = "pasdak_v41_economy";
 
 class Game {
     constructor() {
@@ -361,8 +367,12 @@ class Game {
         this.costNorm = 100;
         this.costPrem = 1000;
         
+        // 경제 시스템 추가
+        this.costPizza = 500;
+        this.costFever = 3000;
+        
         this.feverTimer = 0;
-        this.pizzaCooldown = 0; // 피자 쿨타임 (초)
+        this.pizzaCooldown = 0;
 
         this.ui = {
             cp: document.getElementById('ui-cp'),
@@ -382,7 +392,10 @@ class Game {
             btnNorm: document.getElementById('btn-norm'),
             btnPrem: document.getElementById('btn-prem'),
             btnPizza: document.getElementById('btn-pizza'),
-            cdPizza: document.getElementById('cd-pizza')
+            cdPizza: document.getElementById('cd-pizza'),
+            btnFever: document.getElementById('btn-fever'), // New
+            costPizza: document.getElementById('cost-pizza'), // New
+            costFever: document.getElementById('cost-fever')  // New
         };
 
         if(localStorage.getItem(SAVE_KEY)) this.loadGame();
@@ -394,7 +407,11 @@ class Game {
 
     saveGame() {
         if(this.isOver) return;
-        const data = { cp: this.cp, stress: this.stress, pasdaks: this.pasdaks, costNorm: this.costNorm, costPrem: this.costPrem };
+        const data = { 
+            cp: this.cp, stress: this.stress, pasdaks: this.pasdaks, 
+            costNorm: this.costNorm, costPrem: this.costPrem,
+            costPizza: this.costPizza, costFever: this.costFever 
+        };
         localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     }
 
@@ -406,6 +423,8 @@ class Game {
                 this.pasdaks = d.pasdaks || [];
                 this.costNorm = d.costNorm || 100;
                 this.costPrem = d.costPrem || 1000;
+                this.costPizza = d.costPizza || 500;
+                this.costFever = d.costFever || 3000;
             }
         } catch (e) {}
     }
@@ -419,24 +438,38 @@ class Game {
     }
 
     buyPizza() {
-        if(this.feverTimer > 0) { alert("🔥 실베 타임(비상사태) 중에는 여유롭게 피자를 돌릴 수 없습니다!"); return; }
+        if(this.feverTimer > 0) { alert("🔥 실베 타임(비상사태) 중에는 피자를 돌릴 수 없습니다!"); return; }
         if(this.pizzaCooldown > 0) { alert("쿨타임 중입니다!"); return; }
-        if(this.cp < 1000) { alert("CP가 부족합니다 (비용: 1000)."); return; }
+        if(this.cp < this.costPizza) { alert("CP가 부족합니다."); return; }
         if(this.stress <= 0) { alert("이미 민심이 좋습니다."); return; }
         
-        this.cp -= 1000;
+        this.cp -= this.costPizza;
         this.stress = Math.max(0, this.stress - 20);
-        this.pizzaCooldown = 5; // 5초 쿨타임
-        this.log("🍕 [피자] 피자를 돌려 민심을 잠재웠습니다.", "l-work");
+        
+        // 피자 가격 인상 (물가 상승)
+        this.costPizza = Math.floor(this.costPizza * 1.1);
+        
+        this.pizzaCooldown = 5; 
+        this.log(`🍕 [피자] 피자를 돌려 민심을 잠재웠습니다. (다음 가격: ${this.costPizza} CP)`, "l-work");
         this.updateUI();
+        this.saveGame();
     }
 
     triggerFever() {
         if(this.feverTimer > 0) return;
-        if(confirm("실시간 베스트(실베)로 글을 보냅니다.\n수익이 3배가 되지만, 스트레스가 폭증하며 피자를 돌릴 수 없습니다.")) {
+        if(this.cp < this.costFever) { alert("알바비(CP)가 부족합니다."); return; }
+        
+        if(confirm(`실베 알바에게 ${this.costFever} CP를 뇌물로 줍니다.\n수익 3배, 스트레스 폭증, 피자 불가. 진행합니까?`)) {
+            this.cp -= this.costFever;
             this.feverTimer = 15;
-            this.log("🔥 [실베] 갤러리가 실시간 베스트에 노출되었습니다! 유입 폭주!", "l-chaos");
+            
+            // 알바비 인상
+            this.costFever = Math.floor(this.costFever * 1.15); // 더 가파르게 상승
+            
+            this.log("🔥 [실베] 뇌물이 통했습니다! 실시간 베스트 노출 시작!", "l-chaos");
             document.body.style.animation = "shake 0.5s infinite";
+            this.updateUI();
+            this.saveGame();
         }
     }
 
@@ -550,20 +583,16 @@ class Game {
             const idx1 = ranks.indexOf(p1R);
             const idx2 = ranks.indexOf(p2R);
             const diff = Math.abs(idx1 - idx2);
-            
-            // 난이도 상향: 기본 30% + (차이 * 10%)
             const failChance = 0.30 + (diff * 0.10);
 
             if(Math.random() < failChance) {
                 newRank = 'F';
             } else {
                 if (diff === 0) {
-                    // 동일 등급: 40% 승급
                     if (idx1 < 4 && Math.random() < 0.4) newRank = ranks[idx1 + 1];
                     else newRank = ranks[idx1];
                 } 
                 else if (diff === 1) {
-                    // 인접 등급: 20% 대박 승급
                     const high = Math.max(idx1, idx2);
                     if(high < 4 && Math.random() < 0.2) newRank = ranks[high + 1];
                     else newRank = ranks[high];
@@ -651,7 +680,7 @@ class Game {
         // 실베 타임 (너프됨)
         if(this.feverTimer > 0) {
             this.feverTimer--;
-            this.stress += 3.0; // 스트레스 폭증
+            this.stress += 3.0; 
             if(this.feverTimer <= 0) {
                 document.body.style.animation = "none";
                 this.log("💤 [실베] 실베 타임 종료. 갤러리가 진정되었습니다.", "l-sys");
@@ -847,9 +876,13 @@ class Game {
         document.getElementById('cost-norm').innerText = this.costNorm + " CP";
         document.getElementById('cost-prem').innerText = this.costPrem + " CP";
         
+        this.ui.costPizza.innerText = this.costPizza + " CP";
+        this.ui.costFever.innerText = this.costFever + " CP";
+        
         this.ui.btnNorm.disabled = this.cp < this.costNorm || this.pasdaks.length >= this.maxSlots;
         this.ui.btnPrem.disabled = this.cp < this.costPrem || this.pasdaks.length >= this.maxSlots;
-        this.ui.btnPizza.disabled = this.cp < 1000 || this.pizzaCooldown > 0 || this.feverTimer > 0; // 버튼 활성화 조건 갱신
+        this.ui.btnPizza.disabled = this.cp < this.costPizza || this.pizzaCooldown > 0 || this.feverTimer > 0;
+        this.ui.btnFever.disabled = this.cp < this.costFever || this.feverTimer > 0;
     }
 
     log(msg, cls) {
